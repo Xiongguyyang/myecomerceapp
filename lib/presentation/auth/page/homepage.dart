@@ -25,11 +25,20 @@ class bodyHomePage extends StatefulWidget {
 class _StatehomePage extends State<bodyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       children: [
-        const Expanded(child: Searchbar()),
-        SizedBox(width: 10),
-        _iconSearchWidget(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+          child: Row(
+            children: [
+              const Expanded(child: Searchbar()),
+              const SizedBox(width: 10),
+              _iconSearchWidget(),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        _promotionWidget(),
       ],
     );
   }
@@ -43,6 +52,57 @@ Widget _iconSearchWidget() {
         IconButton(
           onPressed: () {},
           icon: Icon(Icons.search_outlined, color: Colors.white, size: 35),
+        ),
+      ],
+    ),
+  ));
+}
+
+Widget _promotionWidget() {
+  final _imagelongShow = [
+    "assets/images/imagelong1.png",
+    "assets/images/imagelong2.png",
+    "assets/images/imagelong3.png",
+    "assets/images/imagelong4.png",
+  ];
+
+  return (Container(
+    margin: EdgeInsets.all(10),
+    child: Column(
+      children: [
+        Container(
+          width: double.infinity,
+          margin: EdgeInsets.only(left: 10, right: 10),
+
+          child: const Expanded(
+            child: Text(
+              "Promotoin",
+              textAlign: TextAlign.start,
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          ),
+        ),
+
+        Container(
+          decoration: BoxDecoration(
+            // border: Border.all(color: Colors.white),
+            // color: const Color.fromARGB(49, 48, 47, 47),
+          ),
+          height: 200,
+          margin: EdgeInsets.all(10),
+          child: Row(
+            children: _imagelongShow.map((imagePath) {
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(5),
+                    child: Image.asset(imagePath, fit: BoxFit.cover),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ],
     ),
