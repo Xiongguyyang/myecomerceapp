@@ -4,6 +4,7 @@ import 'package:myecomerceapp/core/constants/app_colors.dart';
 import 'package:myecomerceapp/presentation/cart/cubit/cart_cubit.dart';
 import 'package:myecomerceapp/presentation/cart/cubit/cart_state.dart';
 import 'package:myecomerceapp/presentation/cart/widgets/cart_item_widget.dart';
+import 'package:myecomerceapp/presentation/home/pages/payment_page.dart';
 
 class CartPage extends StatelessWidget {
   const CartPage({super.key});
@@ -28,7 +29,10 @@ class CartPage extends StatelessWidget {
               if (state is CartLoaded && !state.isEmpty) {
                 return IconButton(
                   onPressed: () => _showClearDialog(context),
-                  icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
+                  icon: const Icon(
+                    Icons.delete_sweep_outlined,
+                    color: AppColors.textSecondary,
+                  ),
                 );
               }
               return const SizedBox.shrink();
@@ -48,9 +52,16 @@ class CartPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, color: AppColors.error, size: 48),
+                  const Icon(
+                    Icons.error_outline,
+                    color: AppColors.error,
+                    size: 48,
+                  ),
                   const SizedBox(height: 12),
-                  Text(state.message, style: const TextStyle(color: AppColors.textSecondary)),
+                  Text(
+                    state.message,
+                    style: const TextStyle(color: AppColors.textSecondary),
+                  ),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: () => context.read<CartCubit>().loadCart(),
@@ -77,15 +88,17 @@ class CartPage extends StatelessWidget {
                         item: item,
                         onQuantityChanged: (newQuantity) {
                           context.read<CartCubit>().updateItemQuantity(
-                                item.product.id,
-                                newQuantity,
-                              );
+                            item.product.id,
+                            newQuantity,
+                          );
                         },
                         onRemove: () {
                           context.read<CartCubit>().removeItem(item.product.id);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('${item.product.name} removed from cart'),
+                              content: Text(
+                                '${item.product.name} removed from cart',
+                              ),
                               backgroundColor: AppColors.surface,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(
@@ -99,7 +112,7 @@ class CartPage extends StatelessWidget {
                   ),
                 ),
                 // Bottom checkout section
-                _buildCheckoutBar(state),
+                _buildCheckoutBar(state, context),
               ],
             );
           }
@@ -114,7 +127,11 @@ class CartPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.shopping_cart_outlined, color: AppColors.textHint, size: 80),
+          Icon(
+            Icons.shopping_cart_outlined,
+            color: AppColors.textHint,
+            size: 80,
+          ),
           SizedBox(height: 20),
           Text(
             'Your cart is empty',
@@ -134,7 +151,7 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCheckoutBar(CartLoaded state) {
+  Widget _buildCheckoutBar(CartLoaded state, BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 34),
       decoration: BoxDecoration(
@@ -161,7 +178,10 @@ class CartPage extends StatelessWidget {
               ),
               Text(
                 '\$${state.totalPrice.toStringAsFixed(2)}',
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 15),
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 15,
+                ),
               ),
             ],
           ),
@@ -176,7 +196,9 @@ class CartPage extends StatelessWidget {
               Text(
                 state.totalPrice >= 50 ? 'FREE' : '\$5.99',
                 style: TextStyle(
-                  color: state.totalPrice >= 50 ? AppColors.success : AppColors.textSecondary,
+                  color: state.totalPrice >= 50
+                      ? AppColors.success
+                      : AppColors.textSecondary,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
@@ -214,7 +236,13 @@ class CartPage extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                // Checkout action placeholder
+                if(state.totalItems >= 1){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const PaymentPage()),
+                  );
+
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.accent,
@@ -224,10 +252,11 @@ class CartPage extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'Checkout (${state.totalItems} items)',
+                'Checkout ${state.totalItems} items payment',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17,
+                  backgroundColor: Color.fromARGB(0, 216, 216, 216),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -238,12 +267,22 @@ class CartPage extends StatelessWidget {
     );
   }
 
+  
+
+
+
+
+
+
   void _showClearDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Clear Cart', style: TextStyle(color: AppColors.textPrimary)),
+        title: const Text(
+          'Clear Cart',
+          style: TextStyle(color: AppColors.textPrimary),
+        ),
         content: const Text(
           'Are you sure you want to remove all items?',
           style: TextStyle(color: AppColors.textSecondary),
@@ -251,14 +290,20 @@ class CartPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.textHint)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppColors.textHint),
+            ),
           ),
           TextButton(
             onPressed: () {
               context.read<CartCubit>().clearAllItems();
               Navigator.pop(ctx);
             },
-            child: const Text('Clear', style: TextStyle(color: AppColors.error)),
+            child: const Text(
+              'Clear',
+              style: TextStyle(color: AppColors.error),
+            ),
           ),
         ],
       ),

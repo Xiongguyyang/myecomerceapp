@@ -11,7 +11,12 @@ import 'package:myecomerceapp/presentation/home/widgets/category_chip.dart';
 import 'package:myecomerceapp/presentation/home/widgets/product_card.dart';
 import 'package:myecomerceapp/presentation/home/widgets/promotion_banner.dart';
 import 'package:myecomerceapp/presentation/product_detail/pages/product_detail_page.dart';
+import 'package:myecomerceapp/presentation/profile/pages/profile_page.dart';
 import 'package:myecomerceapp/presentation/search/pages/search_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -90,10 +95,16 @@ class _HomePageState extends State<HomePage> {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: AppColors.surfaceLight,
-            child: const Icon(Icons.person, color: AppColors.textSecondary, size: 24),
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfilePage()),
+            ),
+            child: CircleAvatar(
+              radius: 22,
+              backgroundColor: AppColors.surfaceLight,
+              child: const Icon(Icons.person, color: AppColors.textSecondary, size: 24),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -101,14 +112,16 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome back',
+                  'Hello,',
                   style: TextStyle(
                     color: AppColors.textHint,
                     fontSize: 13,
                   ),
                 ),
                 Text(
-                  'Flex JK',
+                  (FirebaseAuth.instance.currentUser?.displayName?.trim().isNotEmpty == true)
+                      ? FirebaseAuth.instance.currentUser!.displayName!
+                      : (FirebaseAuth.instance.currentUser?.email?.split('@')[0] ?? 'Guest'),
                   style: GoogleFonts.notoSans(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -178,13 +191,14 @@ class _HomePageState extends State<HomePage> {
         margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: const Color.fromARGB(255, 255, 255, 255),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppColors.divider),
         ),
         child: Row(
           children: [
-            Icon(Icons.search, color: AppColors.textHint, size: 22),
+            Icon(Icons.search,
+             color: AppColors.textHint, size: 22),
             const SizedBox(width: 10),
             Text(
               'Search products...',
@@ -203,6 +217,7 @@ class _HomePageState extends State<HomePage> {
         return SizedBox(
           height: 46,
           child: ListView.separated(
+            
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
             itemCount: state.categories.length,

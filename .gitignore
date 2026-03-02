@@ -46,3 +46,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+#apk password
+storePassword=SHA256withRSA
+keyPassword=773029977
+keyAlias=upload
+storeFile=upload-keystore.jks
