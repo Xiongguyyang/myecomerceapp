@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:myecomerceapp/data/auth/models/user_creation_req.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class AuthFirebaseService {
   Future<Either> signup(UserCreationReq user);
+  Future<Either> signin(String email, String password);
 }
 
 class AuthFirebaseServiceImpl extends AuthFirebaseService {
@@ -27,8 +27,21 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
             "Email": user.Email,
           });
       return Right("Sign up successfully");
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException {
       return Left("Sign up failed");
+    }
+  }
+
+  @override
+  Future<Either> signin(String email, String password) async {
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return Right("Sign in successful");
+    } on FirebaseAuthException catch (e) {
+      return Left(e.message ?? "Sign in failed");
     }
   }
 }
