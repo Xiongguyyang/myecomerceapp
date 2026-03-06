@@ -22,8 +22,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            // App Bar (
+          
           // Custom App Bar with product image
           SliverAppBar(
             expandedHeight: 300,
@@ -71,26 +74,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       );
                     },
                   ),
-                  if (product.hasDiscount)
-                    Positioned(
-                      top: 100,
-                      right: 20,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: AppColors.error,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '-${product.discountPercentage.toStringAsFixed(0)}% OFF',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
+                
                 ],
               ),
             ),
@@ -279,11 +263,13 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               ),
             ),
           ),
-        ],
+          ]
+      )
       ),
 
       // Bottom bar with quantity and add to cart
       bottomNavigationBar: Container(
+        margin: EdgeInsets.only(bottom: 20),
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
         decoration: BoxDecoration(
           color: AppColors.primaryDark,
