@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+<<<<<<< Updated upstream
 import 'package:myecomerceapp/presentation/home/pages/home_page.dart';
+=======
+import 'package:myecomerceapp/presentation/auth/page/homepage.dart';
+>>>>>>> Stashed changes
 import 'package:myecomerceapp/presentation/auth/page/signup.dart';
 import 'package:myecomerceapp/presentation/service_locator.dart';
 import 'package:myecomerceapp/domain/auth/repository/atuh.dart';
@@ -46,12 +50,20 @@ class _SigninPageState extends State<SigninPage> {
         },
         (r) {
           final message = r?.toString() ?? 'Sign in successful';
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text(message)));
           Navigator.pushReplacement(
             context,
+<<<<<<< Updated upstream
             MaterialPageRoute(builder: (context) => const HomePage()),
+=======
+            MaterialPageRoute(builder: (context) => Homepage()),
+>>>>>>> Stashed changes
           );
         },
       );
@@ -88,7 +100,6 @@ class _SigninPageState extends State<SigninPage> {
 }
 
 // text color
-
 TextStyle _textStyle() {
   return const TextStyle(
     color: Colors.white,
@@ -121,7 +132,11 @@ Widget _SignInContent(
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
+<<<<<<< Updated upstream
                     MaterialPageRoute(builder: (context) => const HomePage()),
+=======
+                    MaterialPageRoute(builder: (context) => Homepage()),
+>>>>>>> Stashed changes
                   );
                 },
                 child: Text(
