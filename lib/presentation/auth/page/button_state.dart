@@ -1,4 +1,4 @@
-abstract class ButtonState {}
+ abstract class ButtonState {}
 
 class ButtonLoadingState extends ButtonState {}
 
