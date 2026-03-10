@@ -34,7 +34,6 @@ class ProductCubit extends Cubit<ProductState> {
   Future<void> selectCategory(String categoryId) async {
     final currentState = state;
     if (currentState is! ProductLoaded) return;
-
     emit(ProductLoading());
     final result = await _getProductsByCategory(categoryId);
     result.fold(
