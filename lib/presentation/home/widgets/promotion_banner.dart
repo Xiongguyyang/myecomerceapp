@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:myecomerceapp/core/constants/app_colors.dart';
+import 'package:myecomerceapp/presentation/home/pages/learning/learn_State.dart';
 
 class PromotionBanner extends StatefulWidget {
   const PromotionBanner({super.key});
@@ -82,7 +83,11 @@ class _PromotionBannerState extends State<PromotionBanner> {
                   padding: const EdgeInsets.all(20),
                   child: Row(
                     children: [
-                      Expanded(
+                      TextButton(
+                        onPressed: (){
+                         Navigator.pushReplacement(context, 
+                         MaterialPageRoute(builder: (context) => const LearnStatePage()));
+                        },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
