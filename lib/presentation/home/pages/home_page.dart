@@ -15,9 +15,10 @@ import 'package:myecomerceapp/presentation/profile/pages/profile_page.dart';
 import 'package:myecomerceapp/presentation/search/pages/search_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+<<<<<<< HEAD
 
-
-
+=======
+>>>>>>> 97712c7 (hh)
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -103,7 +104,11 @@ class _HomePageState extends State<HomePage> {
             child: CircleAvatar(
               radius: 22,
               backgroundColor: AppColors.surfaceLight,
-              child: const Icon(Icons.person, color: AppColors.textSecondary, size: 24),
+              child: const Icon(
+                Icons.person,
+                color: AppColors.textSecondary,
+                size: 24,
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -113,15 +118,18 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Text(
                   'Hello,',
-                  style: TextStyle(
-                    color: AppColors.textHint,
-                    fontSize: 13,
-                  ),
+                  style: TextStyle(color: AppColors.textHint, fontSize: 13),
                 ),
                 Text(
-                  (FirebaseAuth.instance.currentUser?.displayName?.trim().isNotEmpty == true)
+                  (FirebaseAuth.instance.currentUser?.displayName
+                              ?.trim()
+                              .isNotEmpty ==
+                          true)
                       ? FirebaseAuth.instance.currentUser!.displayName!
-                      : (FirebaseAuth.instance.currentUser?.email?.split('@')[0] ?? 'Guest'),
+                      : (FirebaseAuth.instance.currentUser?.email?.split(
+                              '@',
+                            )[0] ??
+                            'Guest'),
                   style: GoogleFonts.notoSans(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -152,19 +160,16 @@ class _HomePageState extends State<HomePage> {
                   ),
                   if (count > 0)
                     Positioned(
-                      right: 4,
-                      top: 4,
+                      right: 0,
+                      top: 0,
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: AppColors.accent,
-                          shape: BoxShape.circle,
-                        ),
+                        decoration: const BoxDecoration(shape: BoxShape.circle ,color:  Color.fromARGB(255, 255, 136, 0)),
                         child: Text(
                           count > 99 ? '99+' : '$count',
                           style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -197,8 +202,7 @@ class _HomePageState extends State<HomePage> {
         ),
         child: Row(
           children: [
-            Icon(Icons.search,
-             color: AppColors.textHint, size: 22),
+            Icon(Icons.search, color: AppColors.textHint, size: 22),
             const SizedBox(width: 10),
             Text(
               'Search products...',
@@ -217,7 +221,6 @@ class _HomePageState extends State<HomePage> {
         return SizedBox(
           height: 46,
           child: ListView.separated(
-            
             padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
             itemCount: state.categories.length,
@@ -227,7 +230,8 @@ class _HomePageState extends State<HomePage> {
               return CategoryChip(
                 category: category,
                 isSelected: state.selectedCategory == category.id,
-                onTap: () => context.read<ProductCubit>().selectCategory(category.id),
+                onTap: () =>
+                    context.read<ProductCubit>().selectCategory(category.id),
               );
             },
           ),
@@ -258,7 +262,11 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.all(40),
                   child: Column(
                     children: [
-                      const Icon(Icons.error_outline, color: AppColors.error, size: 48),
+                      const Icon(
+                        Icons.error_outline,
+                        color: AppColors.error,
+                        size: 48,
+                      ),
                       const SizedBox(height: 12),
                       Text(
                         state.message,
@@ -266,7 +274,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(height: 12),
                       ElevatedButton(
-                        onPressed: () => context.read<ProductCubit>().loadProducts(),
+                        onPressed: () =>
+                            context.read<ProductCubit>().loadProducts(),
                         child: const Text('Retry'),
                       ),
                     ],
@@ -283,11 +292,18 @@ class _HomePageState extends State<HomePage> {
                     padding: EdgeInsets.all(40),
                     child: Column(
                       children: [
-                        Icon(Icons.inventory_2_outlined, color: AppColors.textHint, size: 48),
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          color: AppColors.textHint,
+                          size: 48,
+                        ),
                         SizedBox(height: 12),
                         Text(
                           'No products found',
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 16,
+                          ),
                         ),
                       ],
                     ),
@@ -302,37 +318,34 @@ class _HomePageState extends State<HomePage> {
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
               ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final product = state.products[index];
-                  return ProductCard(
-                    product: product,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ProductDetailPage(product: product),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final product = state.products[index];
+                return ProductCard(
+                  product: product,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProductDetailPage(product: product),
+                      ),
+                    );
+                  },
+                  onAddToCart: () {
+                    context.read<CartCubit>().addItem(product.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${product.name} added to cart'),
+                        backgroundColor: AppColors.success,
+                        duration: const Duration(seconds: 1),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      );
-                    },
-                    onAddToCart: () {
-                      context.read<CartCubit>().addItem(product.id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${product.name} added to cart'),
-                          backgroundColor: AppColors.success,
-                          duration: const Duration(seconds: 1),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-                childCount: state.products.length,
-              ),
+                      ),
+                    );
+                  },
+                );
+              }, childCount: state.products.length),
             );
           }
           return const SliverToBoxAdapter(child: SizedBox.shrink());

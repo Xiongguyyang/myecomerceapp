@@ -23,12 +23,13 @@ class SplashPages extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 180, 221, 255),
         body: Center(
           child: Container(
+            alignment: Alignment.center,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                _Textcontentshow(),
-                Image.asset("assets/images/svg.png"),
+                Image.asset("assets/images/svg.png", width: 300,),
+                 _Textcontentshow(),
               ],
             ),
           ),
@@ -40,11 +41,13 @@ class SplashPages extends StatelessWidget {
 
 Widget _Textcontentshow() {
   return Container(
+    alignment: Alignment.center,
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          "Welcome To The Best App In This Planet Earth",
+          "Flex JK Shop",
           style: GoogleFonts.oswald(
             fontSize: 20,
             fontWeight: FontWeight.bold,
