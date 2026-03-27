@@ -1,10 +1,9 @@
 class Product {
   final int id;
   final String name;
-  int? price;
+int price;
 
-
-  Product({required this.id, required this.name, this.price});
+  Product({required this.id, required this.name, required this.price});
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
@@ -15,7 +14,8 @@ class Product {
   }
 }
 
-List<Product> products = [
-  Product(id: 1, name: "jk", price: 9000),
-  Product(id: 2, name: "jk", price: 200),
+List<Product> initialProducts = [
+  Product(id: 1, name: "Josh", price: 9000),
+  Product(id: 2, name: "Mr Jk", price: 200),
+  Product(id: 3, name: "Timmber", price: 300),
 ];

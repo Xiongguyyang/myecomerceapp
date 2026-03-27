@@ -1,13 +1,27 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:myecomerceapp/presentation/home/cubit/product_state.dart';
+import 'package:myecomerceapp/presentation/home/pages/learning/data/data.dart';
+import 'package:myecomerceapp/presentation/home/pages/learning/cubit and state/state.dart';
 
-class Product extends Cubit<ProductState>{
-  Product() : super(ProductInitial()){
+class ProductCubit extends Cubit<ProductState>{
+  ProductCubit() : super(ProductInitial()){
     loadProducts();
   }
-  
-  void loadProducts() async {
+
+  List<Product> _products = [];
+
+  Future<void> loadProducts() async {
     emit(ProductLoading());
-    await Future.delayed(const Duration(seconds: 1));
+    _products = List.from(initialProducts);
+    emit(ProductLoaded(_products));
+  }
+
+  void addProduct(Product product) {
+    _products.add(product);
+    emit(ProductAdded(List.from(_products)));
+  }
+
+  void deleteProduct(int id) {
+    _products.removeWhere((product) => product.id == id);
+    emit(ProductDeleted(List.from(_products)));
   }
 }
