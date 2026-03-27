@@ -297,7 +297,6 @@ class _ProfileViewState extends State<_ProfileView> {
             children: [
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       label,
@@ -326,7 +325,7 @@ class _ProfileViewState extends State<_ProfileView> {
                         value.isEmpty ? '—' : value,
                         style: const TextStyle(
                           color: AppColors.textPrimary,
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

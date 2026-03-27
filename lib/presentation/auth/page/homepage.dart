@@ -90,6 +90,7 @@ Widget _promotionWidget() {
             borderRadius: BorderRadius.circular(10),
           ),
           height: 200,
+
           child: Row(
             children: imagelongShow.map((imagePath) {
               return Expanded(
