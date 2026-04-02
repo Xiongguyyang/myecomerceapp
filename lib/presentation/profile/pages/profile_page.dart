@@ -174,6 +174,7 @@ class _ProfileViewState extends State<_ProfileView> {
           BoxShadow(
             color: AppColors.accent.withValues(alpha: 0.4),
             blurRadius: 16,
+            
             offset: const Offset(0, 6),
           ),
         ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myecomerceapp/core/constants/app_colors.dart';
+import 'package:myecomerceapp/core/utils/app_responsive.dart';
 import 'package:myecomerceapp/domain/product/entities/product_entity.dart';
 import 'package:myecomerceapp/presentation/cart/cubit/cart_cubit.dart';
 
@@ -29,7 +30,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           
           // Custom App Bar with product image
           SliverAppBar(
-            expandedHeight: 300,
+            expandedHeight: R.wp(context, 300).clamp(220.0, 400.0),
             pinned: true,
             backgroundColor: AppColors.primaryDark,
             leading: IconButton(
@@ -269,8 +270,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
       // Bottom bar with quantity and add to cart
       bottomNavigationBar: Container(
-        margin: EdgeInsets.only(bottom: 20),
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
+        padding: EdgeInsets.fromLTRB(
+          R.hp(context), 16, R.hp(context),
+          MediaQuery.of(context).padding.bottom + 16,
+        ),
         decoration: BoxDecoration(
           color: AppColors.primaryDark,
           boxShadow: [

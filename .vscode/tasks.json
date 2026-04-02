@@ -1,0 +1,85 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // ── Flutter ────────────────────────────────────────────────────────────
+    {
+      "label": "Flutter: Get Dependencies",
+      "type": "shell",
+      "command": "flutter pub get",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Flutter: Clean",
+      "type": "shell",
+      "command": "flutter clean",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Flutter: Analyze",
+      "type": "shell",
+      "command": "flutter analyze",
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Flutter: Test",
+      "type": "shell",
+      "command": "flutter test",
+      "group": { "kind": "test", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    // ── Android APK ────────────────────────────────────────────────────────
+    {
+      "label": "Build: APK (Dev)",
+      "type": "shell",
+      "command": "bash scripts/build_apk.sh dev",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build: APK (Prod)",
+      "type": "shell",
+      "command": "bash scripts/build_apk.sh prod",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    // ── iOS IPA ────────────────────────────────────────────────────────────
+    {
+      "label": "Build: IPA (Dev)",
+      "type": "shell",
+      "command": "bash scripts/build_ipa.sh dev",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build: IPA (Prod)",
+      "type": "shell",
+      "command": "bash scripts/build_ipa.sh prod",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    // ── Release (both platforms) ───────────────────────────────────────────
+    {
+      "label": "Release: Dev (APK + IPA)",
+      "type": "shell",
+      "command": "bash scripts/release.sh dev",
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Release: Prod (APK + IPA)",
+      "type": "shell",
+      "command": "bash scripts/release.sh prod",
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    }
+  ]
+}

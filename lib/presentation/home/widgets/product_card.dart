@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myecomerceapp/core/constants/app_colors.dart';
+import 'package:myecomerceapp/core/utils/app_responsive.dart';
 import 'package:myecomerceapp/domain/product/entities/product_entity.dart';
 
 class ProductCard extends StatelessWidget {
@@ -20,7 +21,7 @@ class ProductCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.cardBackground,
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -33,7 +34,7 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product image area
+            // Image
             Expanded(
               flex: 3,
               child: Stack(
@@ -45,35 +46,59 @@ class ProductCard extends StatelessWidget {
                       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                     ),
                     child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(16)),
                       child: Image.network(
                         product.imageUrl,
                         fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
+                        loadingBuilder: (_, child, progress) {
+                          if (progress == null) return child;
                           return Center(
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               color: AppColors.accent,
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
+                              value: progress.expectedTotalBytes != null
+                                  ? progress.cumulativeBytesLoaded /
+                                      progress.expectedTotalBytes!
                                   : null,
                             ),
                           );
                         },
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(
-                            child: Icon(Icons.image_not_supported, color: AppColors.textHint, size: 40),
-                          );
-                        },
+                        errorBuilder: (_, e, s) => const Center(
+                          child: Icon(
+                            Icons.image_not_supported,
+                            color: AppColors.textHint,
+                            size: 36,
+                          ),
+                        ),
                       ),
                     ),
                   ),
+                  // Discount badge
+                  if (product.hasDiscount)
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.error,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '-${product.discountPercentage.toStringAsFixed(0)}%',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
-            // Product info
+            // Info
             Expanded(
               flex: 3,
               child: Padding(
@@ -85,37 +110,35 @@ class ProductCard extends StatelessWidget {
                       product.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.textPrimary,
-                        fontSize: 13,
+                        fontSize: R.sp(context, 12),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    // Rating
                     Row(
                       children: [
-                        const Icon(Icons.star, color: AppColors.star, size: 14),
+                        const Icon(Icons.star, color: AppColors.star, size: 13),
                         const SizedBox(width: 2),
                         Text(
                           '${product.rating}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textSecondary,
-                            fontSize: 12,
+                            fontSize: R.sp(context, 11),
                           ),
                         ),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 3),
                         Text(
                           '(${product.reviewCount})',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textHint,
-                            fontSize: 11,
+                            fontSize: R.sp(context, 10),
                           ),
                         ),
                       ],
                     ),
                     const Spacer(),
-                    // Price and add button
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -126,17 +149,17 @@ class ProductCard extends StatelessWidget {
                               if (product.hasDiscount)
                                 Text(
                                   '\$${product.originalPrice!.toStringAsFixed(2)}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: AppColors.textHint,
-                                    fontSize: 11,
+                                    fontSize: R.sp(context, 10),
                                     decoration: TextDecoration.lineThrough,
                                   ),
                                 ),
                               Text(
                                 '\$${product.price.toStringAsFixed(2)}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: AppColors.accent,
-                                  fontSize: 16,
+                                  fontSize: R.sp(context, 15),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -146,7 +169,7 @@ class ProductCard extends StatelessWidget {
                         GestureDetector(
                           onTap: onAddToCart,
                           child: Container(
-                            padding: const EdgeInsets.all(6),
+                            padding: const EdgeInsets.all(7),
                             decoration: BoxDecoration(
                               color: AppColors.accent,
                               borderRadius: BorderRadius.circular(10),
@@ -154,7 +177,7 @@ class ProductCard extends StatelessWidget {
                             child: const Icon(
                               Icons.add_shopping_cart,
                               color: Colors.white,
-                              size: 18,
+                              size: 17,
                             ),
                           ),
                         ),

@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:myecomerceapp/core/config/app_config.dart';
 import 'package:myecomerceapp/firebase_options.dart';
 import 'package:myecomerceapp/presentation/service_locator.dart' as di;
 import 'package:myecomerceapp/presentation/service_locator.dart';
@@ -17,15 +18,16 @@ import 'package:myecomerceapp/domain/cart/usecases/get_cart_items.dart';
 import 'package:myecomerceapp/domain/cart/usecases/remove_from_cart.dart';
 import 'package:myecomerceapp/domain/cart/usecases/update_cart_quantity.dart';
 
-Future<void> main() async {
+Future<void> mainWithConfig(AppConfig config) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await di.initializeDependencies();
-  runApp(const MyApp());
+  runApp(MyApp(config: config));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AppConfig config;
+  const MyApp({super.key, required this.config});
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +51,8 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Flex JK Shop',
-        debugShowCheckedModeBanner: false,
+        title: 'Flexy',
+        debugShowCheckedModeBanner: config.showDebugBanner,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFF004054),
