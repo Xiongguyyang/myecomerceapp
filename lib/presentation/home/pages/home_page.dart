@@ -15,10 +15,7 @@ import 'package:myecomerceapp/presentation/profile/pages/profile_page.dart';
 import 'package:myecomerceapp/presentation/search/pages/search_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 97712c7 (hh)
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
