@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myecomerceapp/core/constants/app_colors.dart';
+import 'package:myecomerceapp/core/localization/app_localizations.dart';
+import 'package:myecomerceapp/core/localization/locale_keys.dart';
+import 'package:myecomerceapp/core/utils/app_responsive.dart';
 import 'package:myecomerceapp/presentation/cart/cubit/cart_cubit.dart';
 import 'package:myecomerceapp/presentation/home/widgets/product_card.dart';
 import 'package:myecomerceapp/presentation/product_detail/pages/product_detail_page.dart';
@@ -30,7 +33,7 @@ class _SearchPageBody extends StatefulWidget {
 
 class _SearchPageBodyState extends State<_SearchPageBody> {
   final _searchController = TextEditingController();
-  final _focusNode = FocusNode();
+  final _focusNode        = FocusNode();
 
   @override
   void initState() {
@@ -47,6 +50,8 @@ class _SearchPageBodyState extends State<_SearchPageBody> {
 
   @override
   Widget build(BuildContext context) {
+    final cols = R.gridCols(context);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -58,11 +63,14 @@ class _SearchPageBodyState extends State<_SearchPageBody> {
         title: TextField(
           controller: _searchController,
           focusNode: _focusNode,
-          onChanged: (query) => context.read<SearchCubit>().search(query),
+          onChanged: (q) {
+            context.read<SearchCubit>().search(q);
+            setState(() {});
+          },
           style: const TextStyle(color: Colors.white, fontSize: 16),
           cursorColor: AppColors.accent,
           decoration: InputDecoration(
-            hintText: 'Search products, categories...',
+            hintText: context.tr(LK.searchPageHint),
             hintStyle: TextStyle(color: AppColors.textHint),
             border: InputBorder.none,
             suffixIcon: _searchController.text.isNotEmpty
@@ -80,31 +88,12 @@ class _SearchPageBodyState extends State<_SearchPageBody> {
       ),
       body: BlocBuilder<SearchCubit, SearchState>(
         builder: (context, state) {
-          if (state is SearchInitial) {
-            return _buildInitialState();
-          }
-          if (state is SearchLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.accent),
-            );
-          }
-          if (state is SearchError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, color: AppColors.error, size: 48),
-                  const SizedBox(height: 12),
-                  Text(state.message, style: const TextStyle(color: AppColors.textSecondary)),
-                ],
-              ),
-            );
-          }
+          if (state is SearchInitial)  return _buildInitial(context);
+          if (state is SearchLoading)  return const Center(child: CircularProgressIndicator(color: AppColors.accent));
+          if (state is SearchError)    return _buildError(state.message);
           if (state is SearchLoaded) {
-            if (state.isEmpty) {
-              return _buildNoResults(state.query);
-            }
-            return _buildResults(context, state);
+            if (state.isEmpty) return _buildNoResults(context, state.query);
+            return _buildResults(context, state, cols);
           }
           return const SizedBox.shrink();
         },
@@ -112,28 +101,35 @@ class _SearchPageBodyState extends State<_SearchPageBody> {
     );
   }
 
-  Widget _buildInitialState() {
+  Widget _buildInitial(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.search, color: AppColors.textHint.withValues(alpha: 0.5), size: 80),
           const SizedBox(height: 16),
-          const Text(
-            'Search for products',
-            style: TextStyle(color: AppColors.textHint, fontSize: 18),
-          ),
+          Text(context.tr(LK.searchForProducts), style: const TextStyle(color: AppColors.textHint, fontSize: 18)),
           const SizedBox(height: 8),
-          const Text(
-            'Try "headphones", "shoes", or "yoga"',
-            style: TextStyle(color: AppColors.textHint, fontSize: 14),
-          ),
+          Text(context.tr(LK.searchTip), style: const TextStyle(color: AppColors.textHint, fontSize: 14)),
         ],
       ),
     );
   }
 
-  Widget _buildNoResults(String query) {
+  Widget _buildError(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, color: AppColors.error, size: 48),
+          const SizedBox(height: 12),
+          Text(message, style: const TextStyle(color: AppColors.textSecondary)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoResults(BuildContext context, String query) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -141,67 +137,55 @@ class _SearchPageBodyState extends State<_SearchPageBody> {
           const Icon(Icons.search_off, color: AppColors.textHint, size: 60),
           const SizedBox(height: 16),
           Text(
-            'No results for "$query"',
-            style: const TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            '${context.tr(LK.noResultsFor)} "$query"',
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Try different keywords',
-            style: TextStyle(color: AppColors.textHint, fontSize: 14),
-          ),
+          Text(context.tr(LK.tryDifferentKeywords), style: const TextStyle(color: AppColors.textHint, fontSize: 14)),
         ],
       ),
     );
   }
 
-  Widget _buildResults(BuildContext context, SearchLoaded state) {
+  Widget _buildResults(BuildContext context, SearchLoaded state, int cols) {
+    final count = state.results.length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          padding: EdgeInsets.fromLTRB(R.hp(context), 16, R.hp(context), 12),
           child: Text(
-            '${state.results.length} result${state.results.length == 1 ? '' : 's'} for "${state.query}"',
+            '$count ${context.tr(LK.resultsFor)} "${state.query}"',
             style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
           ),
         ),
         Expanded(
           child: GridView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+            padding: EdgeInsets.symmetric(horizontal: R.hp(context)),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: cols,
               childAspectRatio: 0.65,
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
             ),
-            itemCount: state.results.length,
+            itemCount: count,
             itemBuilder: (context, index) {
               final product = state.results[index];
               return ProductCard(
                 product: product,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ProductDetailPage(product: product),
-                    ),
-                  );
-                },
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => ProductDetailPage(product: product)),
+                ),
                 onAddToCart: () {
                   context.read<CartCubit>().addItem(product.id);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('${product.name} added to cart'),
+                      content: Text('${product.name} ${context.tr(LK.addedToCart)}'),
                       backgroundColor: AppColors.success,
                       duration: const Duration(seconds: 1),
                       behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   );
                 },

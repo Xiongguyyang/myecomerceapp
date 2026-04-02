@@ -1,7 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:myecomerceapp/core/config/app_config.dart';
+import 'package:myecomerceapp/core/localization/locale_cubit.dart';
+import 'package:myecomerceapp/core/theme/app_theme.dart';
+import 'package:myecomerceapp/core/theme/theme_cubit.dart';
 import 'package:myecomerceapp/firebase_options.dart';
 import 'package:myecomerceapp/presentation/service_locator.dart' as di;
 import 'package:myecomerceapp/presentation/service_locator.dart';
@@ -22,17 +26,28 @@ Future<void> mainWithConfig(AppConfig config) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await di.initializeDependencies();
-  runApp(MyApp(config: config));
+
+  // Load saved language and theme before the first frame.
+  final localeCubit = LocaleCubit();
+  await localeCubit.init();
+  final themeCubit = ThemeCubit();
+  await themeCubit.init();
+
+  runApp(MyApp(config: config, localeCubit: localeCubit, themeCubit: themeCubit));
 }
 
 class MyApp extends StatelessWidget {
   final AppConfig config;
-  const MyApp({super.key, required this.config});
+  final LocaleCubit localeCubit;
+  final ThemeCubit themeCubit;
+  const MyApp({super.key, required this.config, required this.localeCubit, required this.themeCubit});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider.value(value: localeCubit),
+        BlocProvider.value(value: themeCubit),
         BlocProvider(
           create: (_) => ProductCubit(
             getAllProducts: sl<GetAllProducts>(),
@@ -50,19 +65,35 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ],
-      child: MaterialApp(
-        title: 'Flexy',
-        debugShowCheckedModeBanner: config.showDebugBanner,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF004054),
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
-        ),
-        home: BlocProvider(
-          create: (_) => SplashCubit(),
-          child: const SplashPages(),
+      // BlocBuilder rebuilds MaterialApp when locale or theme changes.
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) => BlocBuilder<LocaleCubit, Locale>(
+          builder: (context, locale) {
+            return MaterialApp(
+              title: 'Flexy',
+              debugShowCheckedModeBanner: config.showDebugBanner,
+              locale: locale,
+              themeMode: themeMode,
+              theme: AppTheme.light,
+              darkTheme: AppTheme.dark,
+              supportedLocales: const [Locale('en'), Locale('lo')],
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              localeResolutionCallback: (deviceLocale, supportedLocales) {
+                const flutterBuiltIn = ['en', 'ar', 'fr', 'de', 'es', 'ja', 'ko',
+                  'pt', 'ru', 'zh', 'it', 'nl', 'pl', 'sv', 'th', 'tr', 'uk'];
+                if (flutterBuiltIn.contains(locale.languageCode)) return locale;
+                return const Locale('en');
+              },
+              home: BlocProvider(
+                create: (_) => SplashCubit(),
+                child: const SplashPages(),
+              ),
+            );
+          },
         ),
       ),
     );

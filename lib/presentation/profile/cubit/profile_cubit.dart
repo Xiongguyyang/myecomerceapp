@@ -1,28 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:myecomerceapp/presentation/profile/cubit/profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
+  static const _imagePathKey   = 'flexy_profile_image';
+  static const _avatarIndexKey = 'flexy_profile_avatar';
+
   ProfileCubit() : super(ProfileInitial());
 
   Future<void> loadProfile() async {
     emit(ProfileLoading());
 
-    // Firebase Auth is always available — use it as the guaranteed base.
     final authUser = FirebaseAuth.instance.currentUser;
     if (authUser == null) {
       emit(ProfileError('Not signed in'));
       return;
     }
 
-    // Parse display name if set (e.g. "John Doe")
     final nameParts = (authUser.displayName ?? '').trim().split(' ');
     String firstName = nameParts.isNotEmpty ? nameParts.first : '';
     String lastName  = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
     String email     = authUser.email ?? '';
 
-    // Try to enrich from Firestore — but never fail because of it.
     try {
       final doc = await FirebaseFirestore.instance
           .collection('Users')
@@ -40,42 +41,79 @@ class ProfileCubit extends Cubit<ProfileState> {
             ? data['Email'] as String
             : email;
       }
-    } catch (_) {
-      // Firestore unavailable or rules blocked — Auth data is enough.
-    }
+    } catch (_) {}
+
+    final prefs       = await SharedPreferences.getInstance();
+    final imagePath   = prefs.getString(_imagePathKey);
+    final avatarIndex = prefs.getInt(_avatarIndexKey) ?? -1;
 
     emit(ProfileLoaded(
       firstName: firstName,
       lastName: lastName,
       email: email,
+      imagePath: imagePath,
+      avatarIndex: avatarIndex,
     ));
   }
 
   Future<void> updateProfile({
     required String firstName,
     required String lastName,
-    required String email,
   }) async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid == null) return;
+    final current = state is ProfileLoaded ? state as ProfileLoaded : null;
+    final uid     = FirebaseAuth.instance.currentUser?.uid;
 
-    try {
-      await FirebaseFirestore.instance.collection('Users').doc(uid).set(
-        {
-          'FirstName': firstName.trim(),
-          'LastName': lastName.trim(),
-          'Email': email.trim(),
-        },
-        SetOptions(merge: true),
-      );
-    } catch (_) {
-      // Best-effort — update the UI regardless.
+    if (uid != null) {
+      try {
+        await FirebaseFirestore.instance.collection('Users').doc(uid).set(
+          {
+            'FirstName': firstName.trim(),
+            'LastName':  lastName.trim(),
+          },
+          SetOptions(merge: true),
+        );
+        await FirebaseAuth.instance.currentUser?.updateDisplayName(
+          '${firstName.trim()} ${lastName.trim()}'.trim(),
+        );
+      } catch (_) {}
     }
 
     emit(ProfileLoaded(
       firstName: firstName.trim(),
       lastName: lastName.trim(),
-      email: email.trim(),
+      email: current?.email ?? '',
+      imagePath: current?.imagePath,
+      avatarIndex: current?.avatarIndex ?? -1,
+    ));
+  }
+
+  Future<void> setImagePath(String path) async {
+    final current = state is ProfileLoaded ? state as ProfileLoaded : null;
+    final prefs   = await SharedPreferences.getInstance();
+    await prefs.setString(_imagePathKey, path);
+    await prefs.remove(_avatarIndexKey);
+
+    emit(ProfileLoaded(
+      firstName: current?.firstName ?? '',
+      lastName: current?.lastName ?? '',
+      email: current?.email ?? '',
+      imagePath: path,
+      avatarIndex: -1,
+    ));
+  }
+
+  Future<void> setAvatar(int index) async {
+    final current = state is ProfileLoaded ? state as ProfileLoaded : null;
+    final prefs   = await SharedPreferences.getInstance();
+    await prefs.setInt(_avatarIndexKey, index);
+    await prefs.remove(_imagePathKey);
+
+    emit(ProfileLoaded(
+      firstName: current?.firstName ?? '',
+      lastName: current?.lastName ?? '',
+      email: current?.email ?? '',
+      imagePath: null,
+      avatarIndex: index,
     ));
   }
 

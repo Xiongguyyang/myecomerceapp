@@ -3,6 +3,7 @@ const Map<String, String> enTranslations = {
   'app_name'             : 'Flexy',
   'retry'                : 'Retry',
   'cancel'               : 'Cancel',
+  'clear'                : 'Clear',
   'save'                 : 'Save',
   'confirm'              : 'Confirm',
   'error'                : 'Error',
@@ -25,6 +26,7 @@ const Map<String, String> enTranslations = {
   'create_subtitle'      : 'Join Flexy and start shopping',
   'fill_all_fields'      : 'Please fill in all fields',
   'password_too_short'   : 'Password must be at least 6 characters',
+  'enter_email_password' : 'Please enter email and password',
 
   // Home
   'hello'                : 'Hello,',
@@ -32,6 +34,14 @@ const Map<String, String> enTranslations = {
   'categories'           : 'Categories',
   'products'             : 'Products',
   'no_products'          : 'No products found',
+
+  // Search
+  'search_page_hint'     : 'Search products, categories...',
+  'search_for_products'  : 'Search for products',
+  'search_tip'           : 'Try "headphones", "shoes", or "yoga"',
+  'no_results_for'       : 'No results for',
+  'try_different'        : 'Try different keywords',
+  'results_for'          : 'results for',
 
   // Cart
   'cart'                 : 'Shopping Cart',
@@ -68,11 +78,25 @@ const Map<String, String> enTranslations = {
   'privacy_security_sub' : 'Password and security',
   'help_support'         : 'Help & Support',
   'help_support_sub'     : 'FAQs and contact us',
-  'edit_field'           : 'Edit',
   'save_edit'            : 'Save changes',
 
   // Language picker
   'select_language'      : 'Select Language',
   'lang_en'              : 'English',
   'lang_lo'              : 'ພາສາລາວ (Lao)',
+
+  // Theme picker
+  'app_theme'            : 'App Theme',
+  'app_theme_sub'        : 'Dark / Light / System',
+  'select_theme'         : 'Select Theme',
+  'theme_dark'           : 'Dark',
+  'theme_light'          : 'Light',
+  'theme_system'         : 'System Default',
+
+  // Profile edit
+  'edit_profile'         : 'Edit Profile',
+  'upload_photo'         : 'Profile Photo',
+  'camera'               : 'Camera',
+  'gallery'              : 'Gallery',
+  'choose_avatar'        : 'Choose Avatar',
 };

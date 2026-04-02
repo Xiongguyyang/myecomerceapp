@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:myecomerceapp/core/constants/app_colors.dart';
+import 'package:myecomerceapp/core/localization/app_localizations.dart';
+import 'package:myecomerceapp/core/localization/locale_keys.dart';
 import 'package:myecomerceapp/core/utils/app_responsive.dart';
 import 'package:myecomerceapp/domain/auth/repository/atuh.dart';
 import 'package:myecomerceapp/presentation/auth/page/signup.dart';
@@ -17,8 +19,8 @@ class SigninPage extends StatefulWidget {
 class _SigninPageState extends State<SigninPage> {
   final _emailController    = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _loading    = false;
-  bool _obscure    = true;
+  bool _loading = false;
+  bool _obscure = true;
 
   @override
   void dispose() {
@@ -31,7 +33,7 @@ class _SigninPageState extends State<SigninPage> {
     final email    = _emailController.text.trim();
     final password = _passwordController.text;
     if (email.isEmpty || password.isEmpty) {
-      _showSnack('Please enter email and password');
+      _showSnack(context.tr(LK.enterEmailPassword));
       return;
     }
     setState(() => _loading = true);
@@ -39,7 +41,7 @@ class _SigninPageState extends State<SigninPage> {
       final result = await sl<AuthRepository>().signin(email, password);
       if (!mounted) return;
       result.fold(
-        (l) => _showSnack(l?.toString() ?? 'Sign in failed'),
+        (l) => _showSnack(l?.toString() ?? context.tr(LK.error)),
         (_) => Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const HomePage()),
@@ -76,16 +78,13 @@ class _SigninPageState extends State<SigninPage> {
             constraints: BoxConstraints(
               minHeight: MediaQuery.sizeOf(context).height -
                   MediaQuery.of(context).padding.top -
-                  MediaQuery.of(context).padding.bottom -
-                  48,
+                  MediaQuery.of(context).padding.bottom - 48,
             ),
             child: IntrinsicHeight(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 32),
-
-                  // Logo / icon
                   Center(
                     child: Container(
                       width: R.wp(context, 80),
@@ -107,10 +106,8 @@ class _SigninPageState extends State<SigninPage> {
                     ),
                   ),
                   const SizedBox(height: 28),
-
-                  // Title
                   Text(
-                    'Welcome back',
+                    context.tr(LK.welcomeBack),
                     style: GoogleFonts.oswald(
                       fontSize: R.sp(context, 30),
                       fontWeight: FontWeight.bold,
@@ -119,16 +116,11 @@ class _SigninPageState extends State<SigninPage> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Sign in to continue to Flexy',
-                    style: TextStyle(
-                      fontSize: R.sp(context, 14),
-                      color: AppColors.textHint,
-                    ),
+                    context.tr(LK.signInSubtitle),
+                    style: TextStyle(fontSize: R.sp(context, 14), color: AppColors.textHint),
                   ),
                   const SizedBox(height: 36),
-
-                  // Email
-                  _label('Email'),
+                  _label(context.tr(LK.email)),
                   const SizedBox(height: 6),
                   _inputField(
                     controller: _emailController,
@@ -137,9 +129,7 @@ class _SigninPageState extends State<SigninPage> {
                     prefixIcon: Icons.email_outlined,
                   ),
                   const SizedBox(height: 16),
-
-                  // Password
-                  _label('Password'),
+                  _label(context.tr(LK.password)),
                   const SizedBox(height: 6),
                   _inputField(
                     controller: _passwordController,
@@ -156,25 +146,19 @@ class _SigninPageState extends State<SigninPage> {
                     ),
                   ),
                   const SizedBox(height: 32),
-
-                  // Sign in button
                   SizedBox(
                     width: double.infinity,
                     height: R.wp(context, 52),
                     child: _loading
-                        ? const Center(
-                            child: CircularProgressIndicator(color: AppColors.accent),
-                          )
+                        ? const Center(child: CircularProgressIndicator(color: AppColors.accent))
                         : ElevatedButton(
                             onPressed: _signin,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.accent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
                             child: Text(
-                              'Sign In',
+                              context.tr(LK.signIn),
                               style: TextStyle(
                                 color: AppColors.textPrimary,
                                 fontSize: R.sp(context, 16),
@@ -183,21 +167,15 @@ class _SigninPageState extends State<SigninPage> {
                             ),
                           ),
                   ),
-
                   const Spacer(),
                   const SizedBox(height: 24),
-
-                  // Create account
                   Center(
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "Don't have an account? ",
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: R.sp(context, 14),
-                          ),
+                          context.tr(LK.noAccount),
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: R.sp(context, 14)),
                         ),
                         GestureDetector(
                           onTap: () => Navigator.pushReplacement(
@@ -205,7 +183,7 @@ class _SigninPageState extends State<SigninPage> {
                             MaterialPageRoute(builder: (_) => const SignupPage()),
                           ),
                           child: Text(
-                            'Create Account',
+                            context.tr(LK.createAccount),
                             style: TextStyle(
                               color: AppColors.accent,
                               fontSize: R.sp(context, 14),
@@ -254,26 +232,12 @@ class _SigninPageState extends State<SigninPage> {
         hintStyle: TextStyle(color: AppColors.textHint, fontSize: R.sp(context, 14)),
         filled: true,
         fillColor: AppColors.inputFill,
-        prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, color: AppColors.textHint, size: 20)
-            : null,
+        prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.textHint, size: 20) : null,
         suffixIcon: suffix,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.divider),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.divider),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
-        ),
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: R.wp(context, 16),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.divider)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.divider)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.accent, width: 1.5)),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: R.wp(context, 16)),
       ),
     );
   }

@@ -1,10 +1,30 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:myecomerceapp/core/constants/app_colors.dart';
+import 'package:myecomerceapp/core/localization/app_localizations.dart';
+import 'package:myecomerceapp/core/localization/locale_cubit.dart';
+import 'package:myecomerceapp/core/localization/locale_keys.dart';
+import 'package:myecomerceapp/core/theme/theme_cubit.dart';
 import 'package:myecomerceapp/presentation/auth/page/signin.dart';
 import 'package:myecomerceapp/presentation/profile/cubit/profile_cubit.dart';
 import 'package:myecomerceapp/presentation/profile/cubit/profile_state.dart';
+
+// ── Avatar options ─────────────────────────────────────────────────────────────
+const _avatarEmojis = ['🦊', '🐨', '🐯', '🦁', '🐻', '🐼', '🦋', '🐙'];
+const _avatarColors = [
+  Color(0xFF6C63FF),
+  Color(0xFFFF6584),
+  Color(0xFF43C6AC),
+  Color(0xFFFF9800),
+  Color(0xFF00BCD4),
+  Color(0xFF9C27B0),
+  Color(0xFF4CAF50),
+  Color(0xFFE91E63),
+];
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -18,6 +38,7 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
+// ── Main view ─────────────────────────────────────────────────────────────────
 class _ProfileView extends StatefulWidget {
   const _ProfileView();
 
@@ -26,17 +47,29 @@ class _ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<_ProfileView> {
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final _emailController = TextEditingController();
-  String? _editingField;
+  bool _isEditing = false;
+  late final TextEditingController _firstCtrl = TextEditingController();
+  late final TextEditingController _lastCtrl  = TextEditingController();
 
   @override
   void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _emailController.dispose();
+    _firstCtrl.dispose();
+    _lastCtrl.dispose();
     super.dispose();
+  }
+
+  void _startEditing(ProfileLoaded state) {
+    _firstCtrl.text = state.firstName;
+    _lastCtrl.text  = state.lastName;
+    setState(() => _isEditing = true);
+  }
+
+  void _saveEditing(BuildContext context) {
+    context.read<ProfileCubit>().updateProfile(
+      firstName: _firstCtrl.text,
+      lastName:  _lastCtrl.text,
+    );
+    setState(() => _isEditing = false);
   }
 
   @override
@@ -47,72 +80,62 @@ class _ProfileViewState extends State<_ProfileView> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8),
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 2))],
             ),
             child: IconButton(
               padding: EdgeInsets.zero,
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(
-                Icons.arrow_back_ios_new,
-                color: Colors.white,
-                size: 18,
-              ),
+              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
             ),
           ),
         ),
-        title: Text(
-          'My Profile',
-          style: GoogleFonts.aBeeZee(
-            color: AppColors.textPrimary,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+        title: BlocBuilder<LocaleCubit, Locale>(
+          builder: (context, _) => Text(
+            context.tr(LK.myProfile),
+            style: GoogleFonts.aBeeZee(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
         centerTitle: true,
+        actions: [
+          BlocBuilder<ProfileCubit, ProfileState>(
+            builder: (context, state) {
+              if (state is! ProfileLoaded) return const SizedBox.shrink();
+              return _isEditing
+                  ? TextButton(
+                      onPressed: () => _saveEditing(context),
+                      child: Text(context.tr(LK.save), style: const TextStyle(color: AppColors.accent, fontWeight: FontWeight.bold)),
+                    )
+                  : IconButton(
+                      onPressed: () => _startEditing(state),
+                      icon: const Icon(Icons.edit_outlined, color: AppColors.textSecondary),
+                    );
+            },
+          ),
+        ],
       ),
       body: BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) {
           if (state is ProfileLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.accent),
-            );
+            return const Center(child: CircularProgressIndicator(color: AppColors.accent));
           }
           if (state is ProfileError) {
             return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.error_outline,
-                    color: AppColors.error,
-                    size: 48,
-                  ),
+                  const Icon(Icons.error_outline, color: AppColors.error, size: 48),
                   const SizedBox(height: 12),
-                  Text(
-                    state.message,
-                    style: const TextStyle(color: AppColors.textSecondary),
-                  ),
+                  Text(state.message, style: const TextStyle(color: AppColors.textSecondary)),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => context.read<ProfileCubit>().loadProfile(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accent,
-                    ),
-                    child: const Text(
-                      'Retry',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.accent),
+                    child: Text(context.tr(LK.retry), style: const TextStyle(color: Colors.white)),
                   ),
                 ],
               ),
@@ -123,32 +146,29 @@ class _ProfileViewState extends State<_ProfileView> {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
+                  const SizedBox(height: 8),
+                  _AvatarSection(state: state, isEditing: _isEditing),
                   const SizedBox(height: 16),
-                  _buildAvatar(state),
-                  const SizedBox(height: 16),
-                  Text(
-                    state.firstName,
-                    style: GoogleFonts.aBeeZee(
-                      color: AppColors.textPrimary,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                  if (!_isEditing) ...[
+                    Text(
+                      '${state.firstName} ${state.lastName}'.trim().isEmpty
+                          ? 'User'
+                          : '${state.firstName} ${state.lastName}'.trim(),
+                      style: GoogleFonts.aBeeZee(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    state.email,
-                    style: const TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  _buildInfoCard(state),
+                    const SizedBox(height: 4),
+                    Text(state.email, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                    const SizedBox(height: 28),
+                    _buildInfoCard(context, state),
+                  ] else ...[
+                    const SizedBox(height: 12),
+                    _buildEditCard(context, state),
+                  ],
                   const SizedBox(height: 20),
                   _buildMenuSection(context),
                   const SizedBox(height: 20),
                   _buildSignOutButton(context),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                 ],
               ),
             );
@@ -159,40 +179,8 @@ class _ProfileViewState extends State<_ProfileView> {
     );
   }
 
-  Widget _buildAvatar(ProfileLoaded state) {
-    return Container(
-      width: 100,
-      height: 100,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          colors: [AppColors.accent, AppColors.accentLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.accent.withValues(alpha: 0.4),
-            blurRadius: 16,
-            
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          state.initials,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(ProfileLoaded state) {
+  // ── Info card (read-only view) ───────────────────────────────────────────────
+  Widget _buildInfoCard(BuildContext context, ProfileLoaded state) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -204,83 +192,22 @@ class _ProfileViewState extends State<_ProfileView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Personal Information',
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.2,
-            ),
+          Text(
+            context.tr(LK.personalInfo),
+            style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.2),
           ),
           const SizedBox(height: 16),
-          _buildInfoRow(
-            Icons.person_outline,
-            'First Name',
-            state.firstName,
-            state,
-            'firstName',
-            _firstNameController,
-          ),
+          _infoRow(Icons.person_outline, context.tr(LK.firstName), state.firstName),
           const Divider(color: AppColors.divider, height: 24),
-          _buildInfoRow(
-            Icons.person,
-            'Last Name',
-            state.lastName,
-            state,
-            'lastName',
-            _lastNameController,
-          ),
+          _infoRow(Icons.person, context.tr(LK.lastName), state.lastName),
           const Divider(color: AppColors.divider, height: 24),
-          _buildInfoRow(
-            Icons.email_outlined,
-            'Email',
-            state.email,
-            state,
-            'email',
-            _emailController,
-          ),
-          const SizedBox(height: 16),
-          if (_editingField != null)
-            Container(
-              alignment: Alignment.center,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 251, 251, 251),
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 30),
-                ),
-                onPressed: () {
-                  context.read<ProfileCubit>().updateProfile(
-                    firstName: _firstNameController.text,
-                    lastName: _lastNameController.text,
-                    email: _emailController.text,
-                  );
-                  setState(() => _editingField = null); // close any open field
-                },
-                child: const Text(
-                  "Save edit",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+          _infoRow(Icons.email_outlined, context.tr(LK.email), state.email, isLocked: true),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(
-    IconData icon,
-    String label,
-    String value,
-    ProfileLoaded state,
-    String fieldKey,
-    TextEditingController controller,
-  ) {
-    final isEditing = _editingField == fieldKey;
-
+  Widget _infoRow(IconData icon, String label, String value, {bool isLocked = false}) {
     return Row(
       children: [
         Container(
@@ -293,144 +220,257 @@ class _ProfileViewState extends State<_ProfileView> {
         ),
         const SizedBox(width: 14),
         Expanded(
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        color: AppColors.textHint,
-                        fontSize: 11,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    if (isEditing)
-                      TextFormField(
-                        controller: controller,
-                        autofocus: true,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 15,
-                        ),
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 6),
-                          border: OutlineInputBorder(),
-                        ),
-                      )
-                    else
-                      Text(
-                        value.isEmpty ? '—' : value,
-                        style: const TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              Spacer(),
-              Container(
-                child: IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () {
-                    setState(() {
-                      if (isEditing) {
-                        _editingField = null; // close edit mode
-                      } else {
-                        _editingField = fieldKey;
-                        controller.text = value; // pre-fill with current value
-                      }
-                    });
-                  },
-                  icon: Icon(
-                    isEditing ? Icons.check : Icons.edit_outlined,
-                    color: isEditing ? AppColors.accent : null,
-                  ),
-                ),
-              ),
+              Text(label, style: const TextStyle(color: AppColors.textHint, fontSize: 11)),
+              const SizedBox(height: 2),
+              Text(value.isEmpty ? '—' : value, style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
             ],
           ),
         ),
+        if (isLocked)
+          const Icon(Icons.lock_outline, color: AppColors.textHint, size: 18),
       ],
     );
   }
 
-  Widget _buildMenuSection(BuildContext context) {
-    final items = [
-      (Icons.shopping_bag_outlined, 'My Orders', 'View your order history'),
-      (
-        Icons.location_on_outlined,
-        'Saved Addresses',
-        'Manage delivery addresses',
-      ),
-      (Icons.notifications_outlined, 'Notifications', 'Manage your alerts'),
-      (Icons.lock_outline, 'Privacy & Security', 'Password and security'),
-      (Icons.help_outline, 'Help & Support', 'FAQs and contact us'),
-    ];
-
+  // ── Edit card (both names at once) ─────────────────────────────────────────
+  Widget _buildEditCard(BuildContext context, ProfileLoaded state) {
     return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: AppColors.accent.withValues(alpha: 0.4)),
       ),
       child: Column(
-        children: items.asMap().entries.map((entry) {
-          final index = entry.key;
-          final item = entry.value;
-          return Column(
-            children: [
-              ListTile(
-                onTap: () {},
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    item.$1,
-                    color: AppColors.textSecondary,
-                    size: 18,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            context.tr(LK.editProfile),
+            style: const TextStyle(color: AppColors.accent, fontSize: 13, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 16),
+          _editField(_firstCtrl, context.tr(LK.firstName), Icons.person_outline),
+          const SizedBox(height: 14),
+          _editField(_lastCtrl, context.tr(LK.lastName), Icons.person),
+          const SizedBox(height: 14),
+          // Email read-only
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.divider),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.email_outlined, color: AppColors.textHint, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(context.tr(LK.email), style: const TextStyle(color: AppColors.textHint, fontSize: 11)),
+                      const SizedBox(height: 2),
+                      Text(state.email, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                    ],
                   ),
                 ),
-                title: Text(
-                  item.$2,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                subtitle: Text(
-                  item.$3,
-                  style: const TextStyle(
-                    color: AppColors.textHint,
-                    fontSize: 12,
-                  ),
-                ),
-                trailing: const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textHint,
-                  size: 20,
-                ),
+                const Icon(Icons.lock_outline, color: AppColors.textHint, size: 16),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => _saveEditing(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.accent,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              if (index < items.length - 1)
-                const Divider(color: AppColors.divider, height: 1, indent: 60),
-            ],
-          );
-        }).toList(),
+              child: Text(context.tr(LK.saveEdit), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
       ),
     );
   }
 
+  Widget _editField(TextEditingController ctrl, String label, IconData icon) {
+    return TextField(
+      controller: ctrl,
+      style: const TextStyle(color: AppColors.textPrimary),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: AppColors.textHint),
+        prefixIcon: Icon(icon, color: AppColors.accent, size: 20),
+        filled: true,
+        fillColor: AppColors.surfaceLight,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.accent),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+      ),
+    );
+  }
+
+  // ── Menu section ────────────────────────────────────────────────────────────
+  Widget _buildMenuSection(BuildContext context) {
+    return BlocBuilder<LocaleCubit, Locale>(
+      builder: (context, _) {
+        final items = <(IconData, String, String, VoidCallback?)>[
+          (Icons.language,      context.tr(LK.changeLanguage), context.tr(LK.languageSubtitle),  () => _showLanguagePicker(context)),
+          (Icons.palette_outlined, context.tr(LK.appTheme),   context.tr(LK.appThemeSub),         () => _showThemePicker(context)),
+          (Icons.notifications_outlined, context.tr(LK.notifications),  context.tr(LK.notificationsSub),  null),
+          (Icons.lock_outline,  context.tr(LK.privacySecurity), context.tr(LK.privacySecuritySub), null),
+          (Icons.help_outline,  context.tr(LK.helpSupport),    context.tr(LK.helpSupportSub),      null),
+        ];
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.divider),
+          ),
+          child: Column(
+            children: items.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item  = entry.value;
+              return Column(
+                children: [
+                  ListTile(
+                    onTap: item.$4 ?? () {},
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(item.$1, color: AppColors.textSecondary, size: 18),
+                    ),
+                    title: Text(item.$2, style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
+                    subtitle: Text(item.$3, style: const TextStyle(color: AppColors.textHint, fontSize: 12)),
+                    trailing: const Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
+                  ),
+                  if (index < items.length - 1)
+                    const Divider(color: AppColors.divider, height: 1, indent: 60),
+                ],
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  // ── Language picker ─────────────────────────────────────────────────────────
+  void _showLanguagePicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) {
+        final currentCode = context.read<LocaleCubit>().state.languageCode;
+        return BlocProvider.value(
+          value: context.read<LocaleCubit>(),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)))),
+                Text(context.tr(LK.selectLanguage), style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 20),
+                ...AppLanguage.values.map((lang) {
+                  final isSelected = currentCode == lang.code;
+                  return _LanguageTile(
+                    language: lang,
+                    isSelected: isSelected,
+                    onTap: () {
+                      context.read<LocaleCubit>().setLanguage(lang.code);
+                      Navigator.pop(ctx);
+                    },
+                  );
+                }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ── Theme picker ────────────────────────────────────────────────────────────
+  void _showThemePicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) {
+        return BlocProvider.value(
+          value: context.read<ThemeCubit>(),
+          child: BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, currentMode) {
+              final options = [
+                (ThemeMode.dark,   '🌙', context.tr(LK.themeDark)),
+                (ThemeMode.light,  '☀️', context.tr(LK.themeLight)),
+                (ThemeMode.system, '📱', context.tr(LK.themeSystem)),
+              ];
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)))),
+                    Text(context.tr(LK.selectTheme), style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 20),
+                    ...options.map((opt) {
+                      final isSelected = currentMode == opt.$1;
+                      return GestureDetector(
+                        onTap: () {
+                          context.read<ThemeCubit>().setTheme(opt.$1);
+                          Navigator.pop(ctx);
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppColors.accent.withValues(alpha: 0.15) : AppColors.surfaceLight,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: isSelected ? AppColors.accent : AppColors.divider, width: isSelected ? 1.5 : 1),
+                          ),
+                          child: Row(
+                            children: [
+                              Text(opt.$2, style: const TextStyle(fontSize: 22)),
+                              const SizedBox(width: 14),
+                              Text(opt.$3, style: TextStyle(color: isSelected ? AppColors.accent : AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w600)),
+                              const Spacer(),
+                              if (isSelected) const Icon(Icons.check_circle, color: AppColors.accent, size: 22),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  // ── Sign-out button ─────────────────────────────────────────────────────────
   Widget _buildSignOutButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
@@ -440,28 +480,16 @@ class _ProfileViewState extends State<_ProfileView> {
             context: context,
             builder: (_) => AlertDialog(
               backgroundColor: AppColors.surface,
-              title: const Text(
-                'Sign Out',
-                style: TextStyle(color: AppColors.textPrimary),
-              ),
-              content: const Text(
-                'Are you sure you want to sign out?',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
+              title: Text(context.tr(LK.signOutConfirm), style: const TextStyle(color: AppColors.textPrimary)),
+              content: Text(context.tr(LK.signOutQuestion), style: const TextStyle(color: AppColors.textSecondary)),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(color: AppColors.textSecondary),
-                  ),
+                  child: Text(context.tr(LK.cancel), style: const TextStyle(color: AppColors.textSecondary)),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(context, true),
-                  child: const Text(
-                    'Sign Out',
-                    style: TextStyle(color: AppColors.error),
-                  ),
+                  child: Text(context.tr(LK.signOut), style: const TextStyle(color: AppColors.error)),
                 ),
               ],
             ),
@@ -477,16 +505,207 @@ class _ProfileViewState extends State<_ProfileView> {
           }
         },
         icon: const Icon(Icons.logout, color: AppColors.error, size: 18),
-        label: const Text(
-          'Sign Out',
-          style: TextStyle(color: AppColors.error, fontSize: 15),
-        ),
+        label: Text(context.tr(LK.signOut), style: const TextStyle(color: AppColors.error, fontSize: 15)),
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: AppColors.error),
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Avatar section with image picker and avatar grid ──────────────────────────
+class _AvatarSection extends StatelessWidget {
+  final ProfileLoaded state;
+  final bool isEditing;
+
+  const _AvatarSection({required this.state, required this.isEditing});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        _buildAvatar(),
+        if (isEditing)
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: () => _showPhotoOptions(context),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.accent,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.background, width: 2),
+                ),
+                child: const Icon(Icons.camera_alt, color: Colors.white, size: 16),
+              ),
+            ),
           ),
+      ],
+    );
+  }
+
+  Widget _buildAvatar() {
+    if (state.imagePath != null) {
+      return CircleAvatar(
+        radius: 52,
+        backgroundImage: FileImage(File(state.imagePath!)),
+      );
+    }
+    if (state.avatarIndex >= 0 && state.avatarIndex < _avatarEmojis.length) {
+      return CircleAvatar(
+        radius: 52,
+        backgroundColor: _avatarColors[state.avatarIndex],
+        child: Text(_avatarEmojis[state.avatarIndex], style: const TextStyle(fontSize: 40)),
+      );
+    }
+    // Default: initials
+    return Container(
+      width: 104,
+      height: 104,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: const LinearGradient(
+          colors: [AppColors.accent, AppColors.accentLight],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [BoxShadow(color: AppColors.accent.withValues(alpha: 0.4), blurRadius: 16, offset: const Offset(0, 6))],
+      ),
+      child: Center(
+        child: Text(state.initials, style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+
+  void _showPhotoOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => BlocProvider.value(
+        value: context.read<ProfileCubit>(),
+        child: _PhotoOptionsSheet(context: context),
+      ),
+    );
+  }
+}
+
+class _PhotoOptionsSheet extends StatelessWidget {
+  final BuildContext context;
+  const _PhotoOptionsSheet({required this.context});
+
+  Future<void> _pick(ImageSource source, BuildContext ctx) async {
+    Navigator.pop(ctx);
+    final picker = ImagePicker();
+    final file   = await picker.pickImage(source: source, imageQuality: 80, maxWidth: 600);
+    if (file != null && ctx.mounted) {
+      ctx.read<ProfileCubit>().setImagePath(file.path);
+    }
+  }
+
+  @override
+  Widget build(BuildContext sheetCtx) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)))),
+          Text(context.tr(LK.uploadPhoto), style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          _optionTile(sheetCtx, Icons.camera_alt_outlined, context.tr(LK.camera),  () => _pick(ImageSource.camera,  sheetCtx)),
+          const SizedBox(height: 10),
+          _optionTile(sheetCtx, Icons.photo_library_outlined, context.tr(LK.gallery), () => _pick(ImageSource.gallery, sheetCtx)),
+          const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Divider(color: AppColors.divider)),
+          Text(context.tr(LK.chooseAvatar), style: const TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4, crossAxisSpacing: 12, mainAxisSpacing: 12,
+            ),
+            itemCount: _avatarEmojis.length,
+            itemBuilder: (_, i) => GestureDetector(
+              onTap: () {
+                Navigator.pop(sheetCtx);
+                sheetCtx.read<ProfileCubit>().setAvatar(i);
+              },
+              child: Container(
+                decoration: BoxDecoration(color: _avatarColors[i], shape: BoxShape.circle),
+                child: Center(child: Text(_avatarEmojis[i], style: const TextStyle(fontSize: 30))),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _optionTile(BuildContext ctx, IconData icon, String label, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.divider),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.accent, size: 22),
+            const SizedBox(width: 14),
+            Text(label, style: const TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Language tile ─────────────────────────────────────────────────────────────
+class _LanguageTile extends StatelessWidget {
+  final AppLanguage language;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _LanguageTile({required this.language, required this.isSelected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.accent.withValues(alpha: 0.15) : AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isSelected ? AppColors.accent : AppColors.divider, width: isSelected ? 1.5 : 1),
+        ),
+        child: Row(
+          children: [
+            Text(language.flag, style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(language.nativeLabel, style: TextStyle(color: isSelected ? AppColors.accent : AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w600)),
+                  Text(language.label, style: const TextStyle(color: AppColors.textHint, fontSize: 12)),
+                ],
+              ),
+            ),
+            if (isSelected) const Icon(Icons.check_circle, color: AppColors.accent, size: 22),
+          ],
         ),
       ),
     );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:myecomerceapp/core/constants/app_colors.dart';
+import 'package:myecomerceapp/core/localization/app_localizations.dart';
+import 'package:myecomerceapp/core/localization/locale_keys.dart';
 import 'package:myecomerceapp/core/utils/app_responsive.dart';
 import 'package:myecomerceapp/data/auth/models/user_creation_req.dart';
 import 'package:myecomerceapp/domain/auth/repository/atuh.dart';
@@ -38,27 +40,21 @@ class _SignupPageState extends State<SignupPage> {
     final password  = _passwordController.text;
 
     if (firstName.isEmpty || lastName.isEmpty || email.isEmpty || password.isEmpty) {
-      _showSnack('Please fill in all fields');
+      _showSnack(context.tr(LK.fillAllFields));
       return;
     }
     if (password.length < 6) {
-      _showSnack('Password must be at least 6 characters');
+      _showSnack(context.tr(LK.passwordTooShort));
       return;
     }
-
     setState(() => _loading = true);
     try {
       final result = await sl<AuthRepository>().signup(
-        UserCreationReq(
-          FirstName: firstName,
-          LastName: lastName,
-          Email: email,
-          Password: password,
-        ),
+        UserCreationReq(FirstName: firstName, LastName: lastName, Email: email, Password: password),
       );
       if (!mounted) return;
       result.fold(
-        (l) => _showSnack(l?.toString() ?? 'Sign up failed'),
+        (l) => _showSnack(l?.toString() ?? context.tr(LK.error)),
         (_) => Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const SigninPage()),
@@ -106,7 +102,7 @@ class _SignupPageState extends State<SignupPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Create Account',
+                context.tr(LK.createAccount),
                 style: GoogleFonts.oswald(
                   fontSize: R.sp(context, 30),
                   fontWeight: FontWeight.bold,
@@ -115,107 +111,61 @@ class _SignupPageState extends State<SignupPage> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Join Flexy and start shopping',
-                style: TextStyle(
-                  fontSize: R.sp(context, 14),
-                  color: AppColors.textHint,
-                ),
+                context.tr(LK.createSubtitle),
+                style: TextStyle(fontSize: R.sp(context, 14), color: AppColors.textHint),
               ),
               const SizedBox(height: 32),
-
-              // First & Last name side by side on tablet+
               R.isPhone(context)
-                  ? Column(
-                      children: [
-                        _field(controller: _firstNameController, label: 'First Name', icon: Icons.person_outline),
-                        const SizedBox(height: 14),
-                        _field(controller: _lastNameController, label: 'Last Name', icon: Icons.person_outline),
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        Expanded(child: _field(controller: _firstNameController, label: 'First Name', icon: Icons.person_outline)),
-                        const SizedBox(width: 14),
-                        Expanded(child: _field(controller: _lastNameController, label: 'Last Name', icon: Icons.person_outline)),
-                      ],
-                    ),
+                  ? Column(children: [
+                      _field(controller: _firstNameController, label: context.tr(LK.firstName), icon: Icons.person_outline),
+                      const SizedBox(height: 14),
+                      _field(controller: _lastNameController, label: context.tr(LK.lastName), icon: Icons.person_outline),
+                    ])
+                  : Row(children: [
+                      Expanded(child: _field(controller: _firstNameController, label: context.tr(LK.firstName), icon: Icons.person_outline)),
+                      const SizedBox(width: 14),
+                      Expanded(child: _field(controller: _lastNameController, label: context.tr(LK.lastName), icon: Icons.person_outline)),
+                    ]),
               const SizedBox(height: 14),
-
-              _field(
-                controller: _emailController,
-                label: 'Email',
-                icon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-              ),
+              _field(controller: _emailController, label: context.tr(LK.email), icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
               const SizedBox(height: 14),
-
               _field(
                 controller: _passwordController,
-                label: 'Password',
+                label: context.tr(LK.password),
                 icon: Icons.lock_outline,
                 obscureText: _obscure,
                 suffix: IconButton(
-                  icon: Icon(
-                    _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                    color: AppColors.textHint,
-                    size: 20,
-                  ),
+                  icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: AppColors.textHint, size: 20),
                   onPressed: () => setState(() => _obscure = !_obscure),
                 ),
               ),
               const SizedBox(height: 32),
-
               SizedBox(
                 width: double.infinity,
                 height: R.wp(context, 52),
                 child: _loading
-                    ? const Center(
-                        child: CircularProgressIndicator(color: AppColors.accent),
-                      )
+                    ? const Center(child: CircularProgressIndicator(color: AppColors.accent))
                     : ElevatedButton(
                         onPressed: _signup,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.accent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                         child: Text(
-                          'Create Account',
-                          style: TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: R.sp(context, 16),
-                            fontWeight: FontWeight.bold,
-                          ),
+                          context.tr(LK.createAccount),
+                          style: TextStyle(color: AppColors.textPrimary, fontSize: R.sp(context, 16), fontWeight: FontWeight.bold),
                         ),
                       ),
               ),
               const SizedBox(height: 24),
-
               Center(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Already have an account? ',
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: R.sp(context, 14),
-                      ),
-                    ),
+                    Text(context.tr(LK.alreadyHaveAccount), style: TextStyle(color: AppColors.textSecondary, fontSize: R.sp(context, 14))),
                     GestureDetector(
-                      onTap: () => Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SigninPage()),
-                      ),
-                      child: Text(
-                        'Sign In',
-                        style: TextStyle(
-                          color: AppColors.accent,
-                          fontSize: R.sp(context, 14),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const SigninPage())),
+                      child: Text(context.tr(LK.signIn), style: TextStyle(color: AppColors.accent, fontSize: R.sp(context, 14), fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -239,14 +189,7 @@ class _SignupPageState extends State<SignupPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: R.sp(context, 13),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text(label, style: TextStyle(color: AppColors.textSecondary, fontSize: R.sp(context, 13), fontWeight: FontWeight.w600)),
         const SizedBox(height: 6),
         TextField(
           controller: controller,
@@ -259,22 +202,10 @@ class _SignupPageState extends State<SignupPage> {
             fillColor: AppColors.inputFill,
             prefixIcon: Icon(icon, color: AppColors.textHint, size: 20),
             suffixIcon: suffix,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.divider),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.divider),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
-            ),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: R.wp(context, 16),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.divider)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.divider)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.accent, width: 1.5)),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: R.wp(context, 16)),
           ),
         ),
       ],
