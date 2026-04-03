@@ -55,10 +55,11 @@ class _SigninPageState extends State<SigninPage> {
   }
 
   void _showSnack(String msg) {
+    final c = AppColors.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: AppColors.surface,
+        backgroundColor: c.surface,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
@@ -68,9 +69,10 @@ class _SigninPageState extends State<SigninPage> {
   @override
   Widget build(BuildContext context) {
     final pad = R.hp(context);
+    final c = AppColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: pad, vertical: 24),
@@ -111,27 +113,29 @@ class _SigninPageState extends State<SigninPage> {
                     style: GoogleFonts.oswald(
                       fontSize: R.sp(context, 30),
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     context.tr(LK.signInSubtitle),
-                    style: TextStyle(fontSize: R.sp(context, 14), color: AppColors.textHint),
+                    style: TextStyle(fontSize: R.sp(context, 14), color: c.textHint),
                   ),
                   const SizedBox(height: 36),
-                  _label(context.tr(LK.email)),
+                  _label(context.tr(LK.email), c),
                   const SizedBox(height: 6),
                   _inputField(
+                    c: c,
                     controller: _emailController,
                     hint: 'you@example.com',
                     keyboardType: TextInputType.emailAddress,
                     prefixIcon: Icons.email_outlined,
                   ),
                   const SizedBox(height: 16),
-                  _label(context.tr(LK.password)),
+                  _label(context.tr(LK.password), c),
                   const SizedBox(height: 6),
                   _inputField(
+                    c: c,
                     controller: _passwordController,
                     hint: '••••••••',
                     obscureText: _obscure,
@@ -139,7 +143,7 @@ class _SigninPageState extends State<SigninPage> {
                     suffix: IconButton(
                       icon: Icon(
                         _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                        color: AppColors.textHint,
+                        color: c.textHint,
                         size: 20,
                       ),
                       onPressed: () => setState(() => _obscure = !_obscure),
@@ -160,7 +164,7 @@ class _SigninPageState extends State<SigninPage> {
                             child: Text(
                               context.tr(LK.signIn),
                               style: TextStyle(
-                                color: AppColors.textPrimary,
+                                color: c.textPrimary,
                                 fontSize: R.sp(context, 16),
                                 fontWeight: FontWeight.bold,
                               ),
@@ -175,7 +179,7 @@ class _SigninPageState extends State<SigninPage> {
                       children: [
                         Text(
                           context.tr(LK.noAccount),
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: R.sp(context, 14)),
+                          style: TextStyle(color: c.textSecondary, fontSize: R.sp(context, 14)),
                         ),
                         GestureDetector(
                           onTap: () => Navigator.pushReplacement(
@@ -204,16 +208,17 @@ class _SigninPageState extends State<SigninPage> {
     );
   }
 
-  Widget _label(String text) => Text(
+  Widget _label(String text, AppColors c) => Text(
         text,
         style: TextStyle(
-          color: AppColors.textSecondary,
+          color: c.textSecondary,
           fontSize: R.sp(context, 13),
           fontWeight: FontWeight.w600,
         ),
       );
 
   Widget _inputField({
+    required AppColors c,
     required TextEditingController controller,
     required String hint,
     TextInputType keyboardType = TextInputType.text,
@@ -225,18 +230,18 @@ class _SigninPageState extends State<SigninPage> {
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
-      style: TextStyle(color: AppColors.textPrimary, fontSize: R.sp(context, 15)),
+      style: TextStyle(color: c.textPrimary, fontSize: R.sp(context, 15)),
       cursorColor: AppColors.accent,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: AppColors.textHint, fontSize: R.sp(context, 14)),
+        hintStyle: TextStyle(color: c.textHint, fontSize: R.sp(context, 14)),
         filled: true,
-        fillColor: AppColors.inputFill,
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.textHint, size: 20) : null,
+        fillColor: c.inputFill,
+        prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: c.textHint, size: 20) : null,
         suffixIcon: suffix,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.divider)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.divider)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.accent, width: 1.5)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: c.divider)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: c.divider)),
+        focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: AppColors.accent, width: 1.5)),
         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: R.wp(context, 16)),
       ),
     );

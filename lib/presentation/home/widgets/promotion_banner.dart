@@ -59,6 +59,7 @@ class _PromotionBannerState extends State<PromotionBanner> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     final bannerHeight = R.wp(context, 140).clamp(120.0, 180.0);
     final pad = R.hp(context);
 
@@ -127,7 +128,7 @@ class _PromotionBannerState extends State<PromotionBanner> {
               height: 6,
               width: _currentPage == i ? 20 : 6,
               decoration: BoxDecoration(
-                color: _currentPage == i ? AppColors.accent : AppColors.textHint,
+                color: _currentPage == i ? AppColors.accent : c.textHint,
                 borderRadius: BorderRadius.circular(3),
               ),
             ),

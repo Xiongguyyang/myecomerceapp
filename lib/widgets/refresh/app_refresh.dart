@@ -44,7 +44,7 @@ class AppRefresh extends StatelessWidget {
   static Widget sliver({
     required Future<void> Function() onRefresh,
     Color color = AppColors.accent,
-    Color backgroundColor = AppColors.surface,
+    Color? backgroundColor,
   }) {
     return _SliverRefreshControl(
       onRefresh: onRefresh,
@@ -55,10 +55,11 @@ class AppRefresh extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     return RefreshIndicator(
       onRefresh: onRefresh,
       color: color ?? AppColors.accent,
-      backgroundColor: backgroundColor ?? AppColors.surface,
+      backgroundColor: backgroundColor ?? c.surface,
       strokeWidth: 2.5,
       triggerMode: RefreshIndicatorTriggerMode.onEdge,
       child: child,
@@ -70,12 +71,12 @@ class AppRefresh extends StatelessWidget {
 class _SliverRefreshControl extends StatelessWidget {
   final Future<void> Function() onRefresh;
   final Color color;
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   const _SliverRefreshControl({
     required this.onRefresh,
     required this.color,
-    required this.backgroundColor,
+    this.backgroundColor,
   });
 
   @override
@@ -95,22 +96,21 @@ class _SliverRefreshControl extends StatelessWidget {
 class _RefreshTrigger extends StatelessWidget {
   final Future<void> Function() onRefresh;
   final Color color;
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   const _RefreshTrigger({
     required this.onRefresh,
     required this.color,
-    required this.backgroundColor,
+    this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Attaches to the nearest ancestor ScrollController so the
-    // RefreshIndicator listens to the CustomScrollView's scroll position.
+    final c = AppColors.of(context);
     return RefreshIndicator(
       onRefresh: onRefresh,
       color: color,
-      backgroundColor: backgroundColor,
+      backgroundColor: backgroundColor ?? c.surface,
       strokeWidth: 2.5,
       notificationPredicate: (n) => n.depth == 1,
       child: const SizedBox.shrink(),

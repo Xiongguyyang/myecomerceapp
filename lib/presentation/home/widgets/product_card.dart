@@ -17,11 +17,12 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: c.card,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -41,9 +42,9 @@ class ProductCard extends StatelessWidget {
                 children: [
                   Container(
                     width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: AppColors.surfaceLight,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                    decoration: BoxDecoration(
+                      color: c.surfaceLight,
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                     ),
                     child: ClipRRect(
                       borderRadius:
@@ -64,10 +65,10 @@ class ProductCard extends StatelessWidget {
                             ),
                           );
                         },
-                        errorBuilder: (_, e, s) => const Center(
+                        errorBuilder: (_, e, s) => Center(
                           child: Icon(
                             Icons.image_not_supported,
-                            color: AppColors.textHint,
+                            color: c.textHint,
                             size: 36,
                           ),
                         ),
@@ -111,7 +112,7 @@ class ProductCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: AppColors.textPrimary,
+                        color: c.textPrimary,
                         fontSize: R.sp(context, 12),
                         fontWeight: FontWeight.w600,
                       ),
@@ -124,7 +125,7 @@ class ProductCard extends StatelessWidget {
                         Text(
                           '${product.rating}',
                           style: TextStyle(
-                            color: AppColors.textSecondary,
+                            color: c.textSecondary,
                             fontSize: R.sp(context, 11),
                           ),
                         ),
@@ -132,7 +133,7 @@ class ProductCard extends StatelessWidget {
                         Text(
                           '(${product.reviewCount})',
                           style: TextStyle(
-                            color: AppColors.textHint,
+                            color: c.textHint,
                             fontSize: R.sp(context, 10),
                           ),
                         ),
@@ -150,7 +151,7 @@ class ProductCard extends StatelessWidget {
                                 Text(
                                   '\$${product.originalPrice!.toStringAsFixed(2)}',
                                   style: TextStyle(
-                                    color: AppColors.textHint,
+                                    color: c.textHint,
                                     fontSize: R.sp(context, 10),
                                     decoration: TextDecoration.lineThrough,
                                   ),

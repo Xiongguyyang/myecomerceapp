@@ -74,8 +74,9 @@ class _ProfileViewState extends State<_ProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -83,21 +84,21 @@ class _ProfileViewState extends State<_ProfileView> {
           padding: const EdgeInsets.all(8),
           child: Container(
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: c.surface,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 2))],
             ),
             child: IconButton(
               padding: EdgeInsets.zero,
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+              icon: Icon(Icons.arrow_back_ios_new, color: c.textPrimary, size: 18),
             ),
           ),
         ),
         title: BlocBuilder<LocaleCubit, Locale>(
           builder: (context, _) => Text(
             context.tr(LK.myProfile),
-            style: GoogleFonts.aBeeZee(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
+            style: GoogleFonts.aBeeZee(color: c.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
           ),
         ),
         centerTitle: true,
@@ -112,7 +113,7 @@ class _ProfileViewState extends State<_ProfileView> {
                     )
                   : IconButton(
                       onPressed: () => _startEditing(state),
-                      icon: const Icon(Icons.edit_outlined, color: AppColors.textSecondary),
+                      icon: Icon(Icons.edit_outlined, color: c.textSecondary),
                     );
             },
           ),
@@ -130,7 +131,7 @@ class _ProfileViewState extends State<_ProfileView> {
                 children: [
                   const Icon(Icons.error_outline, color: AppColors.error, size: 48),
                   const SizedBox(height: 12),
-                  Text(state.message, style: const TextStyle(color: AppColors.textSecondary)),
+                  Text(state.message, style: TextStyle(color: c.textSecondary)),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => context.read<ProfileCubit>().loadProfile(),
@@ -154,20 +155,20 @@ class _ProfileViewState extends State<_ProfileView> {
                       '${state.firstName} ${state.lastName}'.trim().isEmpty
                           ? 'User'
                           : '${state.firstName} ${state.lastName}'.trim(),
-                      style: GoogleFonts.aBeeZee(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.aBeeZee(color: c.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Text(state.email, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                    Text(state.email, style: TextStyle(color: c.textSecondary, fontSize: 14)),
                     const SizedBox(height: 28),
-                    _buildInfoCard(context, state),
+                    _buildInfoCard(context, state, c),
                   ] else ...[
                     const SizedBox(height: 12),
-                    _buildEditCard(context, state),
+                    _buildEditCard(context, state, c),
                   ],
                   const SizedBox(height: 20),
-                  _buildMenuSection(context),
+                  _buildMenuSection(context, c),
                   const SizedBox(height: 20),
-                  _buildSignOutButton(context),
+                  _buildSignOutButton(context, c),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -180,34 +181,34 @@ class _ProfileViewState extends State<_ProfileView> {
   }
 
   // ── Info card (read-only view) ───────────────────────────────────────────────
-  Widget _buildInfoCard(BuildContext context, ProfileLoaded state) {
+  Widget _buildInfoCard(BuildContext context, ProfileLoaded state, AppColors c) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.divider),
+        border: Border.all(color: c.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             context.tr(LK.personalInfo),
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.2),
+            style: TextStyle(color: c.textSecondary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 1.2),
           ),
           const SizedBox(height: 16),
-          _infoRow(Icons.person_outline, context.tr(LK.firstName), state.firstName),
-          const Divider(color: AppColors.divider, height: 24),
-          _infoRow(Icons.person, context.tr(LK.lastName), state.lastName),
-          const Divider(color: AppColors.divider, height: 24),
-          _infoRow(Icons.email_outlined, context.tr(LK.email), state.email, isLocked: true),
+          _infoRow(context, Icons.person_outline, context.tr(LK.firstName), state.firstName, c),
+          Divider(color: c.divider, height: 24),
+          _infoRow(context, Icons.person, context.tr(LK.lastName), state.lastName, c),
+          Divider(color: c.divider, height: 24),
+          _infoRow(context, Icons.email_outlined, context.tr(LK.email), state.email, c, isLocked: true),
         ],
       ),
     );
   }
 
-  Widget _infoRow(IconData icon, String label, String value, {bool isLocked = false}) {
+  Widget _infoRow(BuildContext context, IconData icon, String label, String value, AppColors c, {bool isLocked = false}) {
     return Row(
       children: [
         Container(
@@ -223,25 +224,25 @@ class _ProfileViewState extends State<_ProfileView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: AppColors.textHint, fontSize: 11)),
+              Text(label, style: TextStyle(color: c.textHint, fontSize: 11)),
               const SizedBox(height: 2),
-              Text(value.isEmpty ? '—' : value, style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
+              Text(value.isEmpty ? '—' : value, style: TextStyle(color: c.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
             ],
           ),
         ),
         if (isLocked)
-          const Icon(Icons.lock_outline, color: AppColors.textHint, size: 18),
+          Icon(Icons.lock_outline, color: c.textHint, size: 18),
       ],
     );
   }
 
   // ── Edit card (both names at once) ─────────────────────────────────────────
-  Widget _buildEditCard(BuildContext context, ProfileLoaded state) {
+  Widget _buildEditCard(BuildContext context, ProfileLoaded state, AppColors c) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: c.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.accent.withValues(alpha: 0.4)),
       ),
@@ -253,33 +254,33 @@ class _ProfileViewState extends State<_ProfileView> {
             style: const TextStyle(color: AppColors.accent, fontSize: 13, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 16),
-          _editField(_firstCtrl, context.tr(LK.firstName), Icons.person_outline),
+          _editField(c, _firstCtrl, context.tr(LK.firstName), Icons.person_outline),
           const SizedBox(height: 14),
-          _editField(_lastCtrl, context.tr(LK.lastName), Icons.person),
+          _editField(c, _lastCtrl, context.tr(LK.lastName), Icons.person),
           const SizedBox(height: 14),
           // Email read-only
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: c.surfaceLight,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.divider),
+              border: Border.all(color: c.divider),
             ),
             child: Row(
               children: [
-                const Icon(Icons.email_outlined, color: AppColors.textHint, size: 18),
+                Icon(Icons.email_outlined, color: c.textHint, size: 18),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(context.tr(LK.email), style: const TextStyle(color: AppColors.textHint, fontSize: 11)),
+                      Text(context.tr(LK.email), style: TextStyle(color: c.textHint, fontSize: 11)),
                       const SizedBox(height: 2),
-                      Text(state.email, style: const TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+                      Text(state.email, style: TextStyle(color: c.textSecondary, fontSize: 14)),
                     ],
                   ),
                 ),
-                const Icon(Icons.lock_outline, color: AppColors.textHint, size: 16),
+                Icon(Icons.lock_outline, color: c.textHint, size: 16),
               ],
             ),
           ),
@@ -301,20 +302,20 @@ class _ProfileViewState extends State<_ProfileView> {
     );
   }
 
-  Widget _editField(TextEditingController ctrl, String label, IconData icon) {
+  Widget _editField(AppColors c, TextEditingController ctrl, String label, IconData icon) {
     return TextField(
       controller: ctrl,
-      style: const TextStyle(color: AppColors.textPrimary),
+      style: TextStyle(color: c.textPrimary),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: AppColors.textHint),
+        labelStyle: TextStyle(color: c.textHint),
         prefixIcon: Icon(icon, color: AppColors.accent, size: 20),
         filled: true,
-        fillColor: AppColors.surfaceLight,
+        fillColor: c.surfaceLight,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.accent),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          borderSide: BorderSide(color: AppColors.accent),
         ),
         contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
       ),
@@ -322,7 +323,7 @@ class _ProfileViewState extends State<_ProfileView> {
   }
 
   // ── Menu section ────────────────────────────────────────────────────────────
-  Widget _buildMenuSection(BuildContext context) {
+  Widget _buildMenuSection(BuildContext context, AppColors c) {
     return BlocBuilder<LocaleCubit, Locale>(
       builder: (context, _) {
         final items = <(IconData, String, String, VoidCallback?)>[
@@ -335,9 +336,9 @@ class _ProfileViewState extends State<_ProfileView> {
 
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: c.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.divider),
+            border: Border.all(color: c.divider),
           ),
           child: Column(
             children: items.asMap().entries.map((entry) {
@@ -353,14 +354,14 @@ class _ProfileViewState extends State<_ProfileView> {
                         color: AppColors.primaryLight.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Icon(item.$1, color: AppColors.textSecondary, size: 18),
+                      child: Icon(item.$1, color: c.textSecondary, size: 18),
                     ),
-                    title: Text(item.$2, style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
-                    subtitle: Text(item.$3, style: const TextStyle(color: AppColors.textHint, fontSize: 12)),
-                    trailing: const Icon(Icons.chevron_right, color: AppColors.textHint, size: 20),
+                    title: Text(item.$2, style: TextStyle(color: c.textPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
+                    subtitle: Text(item.$3, style: TextStyle(color: c.textHint, fontSize: 12)),
+                    trailing: Icon(Icons.chevron_right, color: c.textHint, size: 20),
                   ),
                   if (index < items.length - 1)
-                    const Divider(color: AppColors.divider, height: 1, indent: 60),
+                    Divider(color: c.divider, height: 1, indent: 60),
                 ],
               );
             }).toList(),
@@ -372,9 +373,10 @@ class _ProfileViewState extends State<_ProfileView> {
 
   // ── Language picker ─────────────────────────────────────────────────────────
   void _showLanguagePicker(BuildContext context) {
+    final c = AppColors.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) {
         final currentCode = context.read<LocaleCubit>().state.languageCode;
@@ -386,8 +388,8 @@ class _ProfileViewState extends State<_ProfileView> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)))),
-                Text(context.tr(LK.selectLanguage), style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: c.divider, borderRadius: BorderRadius.circular(2)))),
+                Text(context.tr(LK.selectLanguage), style: TextStyle(color: c.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
                 ...AppLanguage.values.map((lang) {
                   final isSelected = currentCode == lang.code;
@@ -410,15 +412,17 @@ class _ProfileViewState extends State<_ProfileView> {
 
   // ── Theme picker ────────────────────────────────────────────────────────────
   void _showThemePicker(BuildContext context) {
+    final c = AppColors.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) {
         return BlocProvider.value(
           value: context.read<ThemeCubit>(),
           child: BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, currentMode) {
+              final sheetColors = AppColors.of(context);
               final options = [
                 (ThemeMode.dark,   '🌙', context.tr(LK.themeDark)),
                 (ThemeMode.light,  '☀️', context.tr(LK.themeLight)),
@@ -430,8 +434,8 @@ class _ProfileViewState extends State<_ProfileView> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)))),
-                    Text(context.tr(LK.selectTheme), style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                    Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: sheetColors.divider, borderRadius: BorderRadius.circular(2)))),
+                    Text(context.tr(LK.selectTheme), style: TextStyle(color: sheetColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 20),
                     ...options.map((opt) {
                       final isSelected = currentMode == opt.$1;
@@ -444,15 +448,15 @@ class _ProfileViewState extends State<_ProfileView> {
                           margin: const EdgeInsets.only(bottom: 10),
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.accent.withValues(alpha: 0.15) : AppColors.surfaceLight,
+                            color: isSelected ? AppColors.accent.withValues(alpha: 0.15) : sheetColors.surfaceLight,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: isSelected ? AppColors.accent : AppColors.divider, width: isSelected ? 1.5 : 1),
+                            border: Border.all(color: isSelected ? AppColors.accent : sheetColors.divider, width: isSelected ? 1.5 : 1),
                           ),
                           child: Row(
                             children: [
                               Text(opt.$2, style: const TextStyle(fontSize: 22)),
                               const SizedBox(width: 14),
-                              Text(opt.$3, style: TextStyle(color: isSelected ? AppColors.accent : AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w600)),
+                              Text(opt.$3, style: TextStyle(color: isSelected ? AppColors.accent : sheetColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w600)),
                               const Spacer(),
                               if (isSelected) const Icon(Icons.check_circle, color: AppColors.accent, size: 22),
                             ],
@@ -471,7 +475,7 @@ class _ProfileViewState extends State<_ProfileView> {
   }
 
   // ── Sign-out button ─────────────────────────────────────────────────────────
-  Widget _buildSignOutButton(BuildContext context) {
+  Widget _buildSignOutButton(BuildContext context, AppColors c) {
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton.icon(
@@ -479,13 +483,13 @@ class _ProfileViewState extends State<_ProfileView> {
           final confirmed = await showDialog<bool>(
             context: context,
             builder: (_) => AlertDialog(
-              backgroundColor: AppColors.surface,
-              title: Text(context.tr(LK.signOutConfirm), style: const TextStyle(color: AppColors.textPrimary)),
-              content: Text(context.tr(LK.signOutQuestion), style: const TextStyle(color: AppColors.textSecondary)),
+              backgroundColor: c.surface,
+              title: Text(context.tr(LK.signOutConfirm), style: TextStyle(color: c.textPrimary)),
+              content: Text(context.tr(LK.signOutQuestion), style: TextStyle(color: c.textSecondary)),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
-                  child: Text(context.tr(LK.cancel), style: const TextStyle(color: AppColors.textSecondary)),
+                  child: Text(context.tr(LK.cancel), style: TextStyle(color: c.textSecondary)),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(context, true),
@@ -525,10 +529,11 @@ class _AvatarSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     return Stack(
       alignment: Alignment.center,
       children: [
-        _buildAvatar(),
+        _buildAvatar(c),
         if (isEditing)
           Positioned(
             bottom: 0,
@@ -540,7 +545,7 @@ class _AvatarSection extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.accent,
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.background, width: 2),
+                  border: Border.all(color: c.background, width: 2),
                 ),
                 child: const Icon(Icons.camera_alt, color: Colors.white, size: 16),
               ),
@@ -550,7 +555,7 @@ class _AvatarSection extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatar() {
+  Widget _buildAvatar(AppColors c) {
     if (state.imagePath != null) {
       return CircleAvatar(
         radius: 52,
@@ -568,14 +573,14 @@ class _AvatarSection extends StatelessWidget {
     return Container(
       width: 104,
       height: 104,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [AppColors.accent, AppColors.accentLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: [BoxShadow(color: AppColors.accent.withValues(alpha: 0.4), blurRadius: 16, offset: const Offset(0, 6))],
+        boxShadow: [BoxShadow(color: Color(0x6612AEC6), blurRadius: 16, offset: Offset(0, 6))],
       ),
       child: Center(
         child: Text(state.initials, style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
@@ -584,9 +589,10 @@ class _AvatarSection extends StatelessWidget {
   }
 
   void _showPhotoOptions(BuildContext context) {
+    final c = AppColors.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: c.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => BlocProvider.value(
         value: context.read<ProfileCubit>(),
@@ -611,20 +617,21 @@ class _PhotoOptionsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext sheetCtx) {
+    final c = AppColors.of(sheetCtx);
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)))),
-          Text(context.tr(LK.uploadPhoto), style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+          Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: c.divider, borderRadius: BorderRadius.circular(2)))),
+          Text(context.tr(LK.uploadPhoto), style: TextStyle(color: c.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
-          _optionTile(sheetCtx, Icons.camera_alt_outlined, context.tr(LK.camera),  () => _pick(ImageSource.camera,  sheetCtx)),
+          _optionTile(sheetCtx, c, Icons.camera_alt_outlined, context.tr(LK.camera),  () => _pick(ImageSource.camera,  sheetCtx)),
           const SizedBox(height: 10),
-          _optionTile(sheetCtx, Icons.photo_library_outlined, context.tr(LK.gallery), () => _pick(ImageSource.gallery, sheetCtx)),
-          const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Divider(color: AppColors.divider)),
-          Text(context.tr(LK.chooseAvatar), style: const TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
+          _optionTile(sheetCtx, c, Icons.photo_library_outlined, context.tr(LK.gallery), () => _pick(ImageSource.gallery, sheetCtx)),
+          Padding(padding: const EdgeInsets.symmetric(vertical: 16), child: Divider(color: c.divider)),
+          Text(context.tr(LK.chooseAvatar), style: TextStyle(color: c.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           GridView.builder(
             shrinkWrap: true,
@@ -649,21 +656,21 @@ class _PhotoOptionsSheet extends StatelessWidget {
     );
   }
 
-  Widget _optionTile(BuildContext ctx, IconData icon, String label, VoidCallback onTap) {
+  Widget _optionTile(BuildContext ctx, AppColors c, IconData icon, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: AppColors.surfaceLight,
+          color: c.surfaceLight,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.divider),
+          border: Border.all(color: c.divider),
         ),
         child: Row(
           children: [
             Icon(icon, color: AppColors.accent, size: 22),
             const SizedBox(width: 14),
-            Text(label, style: const TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500)),
+            Text(label, style: TextStyle(color: c.textPrimary, fontSize: 15, fontWeight: FontWeight.w500)),
           ],
         ),
       ),
@@ -681,15 +688,16 @@ class _LanguageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.accent.withValues(alpha: 0.15) : AppColors.surfaceLight,
+          color: isSelected ? AppColors.accent.withValues(alpha: 0.15) : c.surfaceLight,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isSelected ? AppColors.accent : AppColors.divider, width: isSelected ? 1.5 : 1),
+          border: Border.all(color: isSelected ? AppColors.accent : c.divider, width: isSelected ? 1.5 : 1),
         ),
         child: Row(
           children: [
@@ -699,8 +707,8 @@ class _LanguageTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(language.nativeLabel, style: TextStyle(color: isSelected ? AppColors.accent : AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w600)),
-                  Text(language.label, style: const TextStyle(color: AppColors.textHint, fontSize: 12)),
+                  Text(language.nativeLabel, style: TextStyle(color: isSelected ? AppColors.accent : c.textPrimary, fontSize: 15, fontWeight: FontWeight.w600)),
+                  Text(language.label, style: TextStyle(color: c.textHint, fontSize: 12)),
                 ],
               ),
             ),

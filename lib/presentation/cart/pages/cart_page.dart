@@ -13,8 +13,9 @@ class CartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
         leading: IconButton(
@@ -31,7 +32,7 @@ class CartPage extends StatelessWidget {
               if (state is CartLoaded && !state.isEmpty) {
                 return IconButton(
                   onPressed: () => _showClearDialog(context),
-                  icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
+                  icon: Icon(Icons.delete_sweep_outlined, color: c.textSecondary),
                 );
               }
               return const SizedBox.shrink();
@@ -51,7 +52,7 @@ class CartPage extends StatelessWidget {
                 children: [
                   const Icon(Icons.error_outline, color: AppColors.error, size: 48),
                   const SizedBox(height: 12),
-                  Text(state.message, style: const TextStyle(color: AppColors.textSecondary)),
+                  Text(state.message, style: TextStyle(color: c.textSecondary)),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: () => context.read<CartCubit>().loadCart(),
@@ -82,7 +83,7 @@ class CartPage extends StatelessWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('${item.product.name} ${context.tr(LK.removedFromCart)}'),
-                              backgroundColor: AppColors.surface,
+                              backgroundColor: AppColors.of(context).surface,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
@@ -103,21 +104,23 @@ class CartPage extends StatelessWidget {
   }
 
   Widget _buildEmptyCart(BuildContext context) {
+    final c = AppColors.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.shopping_cart_outlined, color: AppColors.textHint, size: 80),
+          Icon(Icons.shopping_cart_outlined, color: c.textHint, size: 80),
           const SizedBox(height: 20),
-          Text(context.tr(LK.emptyCart), style: const TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.bold)),
+          Text(context.tr(LK.emptyCart), style: TextStyle(color: c.textPrimary, fontSize: 22, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          Text(context.tr(LK.emptyCartSub), style: const TextStyle(color: AppColors.textHint, fontSize: 16)),
+          Text(context.tr(LK.emptyCartSub), style: TextStyle(color: c.textHint, fontSize: 16)),
         ],
       ),
     );
   }
 
   Widget _buildCheckoutBar(BuildContext context, CartLoaded state) {
+    final c = AppColors.of(context);
     final shipping = state.totalPrice >= 50 ? 0.0 : 5.99;
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 34),
@@ -132,26 +135,29 @@ class CartPage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(context.tr(LK.subtotal), style: const TextStyle(color: AppColors.textSecondary, fontSize: 15)),
-              Text('\$${state.totalPrice.toStringAsFixed(2)}', style: const TextStyle(color: AppColors.textSecondary, fontSize: 15)),
+              Text(context.tr(LK.subtotal), style: const TextStyle(color: Colors.white70, fontSize: 15)),
+              Text('\$${state.totalPrice.toStringAsFixed(2)}', style: const TextStyle(color: Colors.white70, fontSize: 15)),
             ],
           ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(context.tr(LK.shipping), style: const TextStyle(color: AppColors.textSecondary, fontSize: 15)),
+              Text(context.tr(LK.shipping), style: const TextStyle(color: Colors.white70, fontSize: 15)),
               Text(
                 shipping == 0 ? context.tr(LK.freeShipping) : '\$5.99',
-                style: TextStyle(color: shipping == 0 ? AppColors.success : AppColors.textSecondary, fontSize: 15, fontWeight: FontWeight.w600),
+                style: TextStyle(color: shipping == 0 ? AppColors.success : Colors.white70, fontSize: 15, fontWeight: FontWeight.w600),
               ),
             ],
           ),
-          const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Divider(color: AppColors.divider)),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Divider(color: c.divider.withValues(alpha: 0.3)),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(context.tr(LK.total), style: const TextStyle(color: AppColors.textPrimary, fontSize: 20, fontWeight: FontWeight.bold)),
+              Text(context.tr(LK.total), style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
               Text('\$${(state.totalPrice + shipping).toStringAsFixed(2)}', style: const TextStyle(color: AppColors.accent, fontSize: 22, fontWeight: FontWeight.bold)),
             ],
           ),
@@ -179,16 +185,17 @@ class CartPage extends StatelessWidget {
   }
 
   void _showClearDialog(BuildContext context) {
+    final c = AppColors.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        title: Text(context.tr(LK.clearCart), style: const TextStyle(color: AppColors.textPrimary)),
-        content: Text(context.tr(LK.clearCartMsg), style: const TextStyle(color: AppColors.textSecondary)),
+        backgroundColor: c.surface,
+        title: Text(context.tr(LK.clearCart), style: TextStyle(color: c.textPrimary)),
+        content: Text(context.tr(LK.clearCartMsg), style: TextStyle(color: c.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(context.tr(LK.cancel), style: const TextStyle(color: AppColors.textHint)),
+            child: Text(context.tr(LK.cancel), style: TextStyle(color: c.textHint)),
           ),
           TextButton(
             onPressed: () {

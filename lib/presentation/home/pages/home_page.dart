@@ -45,23 +45,24 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final pad = R.hp(context);
+    final c = AppColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       body: SafeArea(
         child: AppRefresh(
           onRefresh: _onRefresh,
           child: CustomScrollView(
             slivers: [
-              SliverToBoxAdapter(child: _buildAppBar(context, pad)),
-              SliverToBoxAdapter(child: _buildSearchBar(context, pad)),
+              SliverToBoxAdapter(child: _buildAppBar(context, pad, c)),
+              SliverToBoxAdapter(child: _buildSearchBar(context, pad, c)),
               const SliverToBoxAdapter(
                 child: Padding(padding: EdgeInsets.only(top: 16), child: PromotionBanner()),
               ),
-              SliverToBoxAdapter(child: _sectionTitle(context, LK.categories, pad)),
+              SliverToBoxAdapter(child: _sectionTitle(context, LK.categories, pad, c)),
               SliverToBoxAdapter(child: _buildCategories(context, pad)),
-              SliverToBoxAdapter(child: _sectionTitle(context, LK.products, pad)),
-              _buildProductGrid(context, pad),
+              SliverToBoxAdapter(child: _sectionTitle(context, LK.products, pad, c)),
+              _buildProductGrid(context, pad, c),
               const SliverToBoxAdapter(child: SizedBox(height: 24)),
             ],
           ),
@@ -70,7 +71,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildAppBar(BuildContext context, double pad) {
+  Widget _buildAppBar(BuildContext context, double pad, AppColors c) {
     final user = FirebaseAuth.instance.currentUser;
     final name = (user?.displayName?.trim().isNotEmpty == true)
         ? user!.displayName!
@@ -85,8 +86,8 @@ class _HomePageState extends State<HomePage> {
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage())),
               child: CircleAvatar(
                 radius: R.wp(context, 22),
-                backgroundColor: AppColors.surfaceLight,
-                child: Icon(Icons.person, color: AppColors.textSecondary, size: R.wp(context, 22)),
+                backgroundColor: c.surfaceLight,
+                child: Icon(Icons.person, color: c.textSecondary, size: R.wp(context, 22)),
               ),
             ),
             const SizedBox(width: 12),
@@ -94,10 +95,10 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(context.tr(LK.hello), style: TextStyle(color: AppColors.textHint, fontSize: R.sp(context, 12))),
+                  Text(context.tr(LK.hello), style: TextStyle(color: c.textHint, fontSize: R.sp(context, 12))),
                   Text(
                     name,
-                    style: GoogleFonts.notoSans(fontSize: R.sp(context, 18), fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                    style: GoogleFonts.notoSans(fontSize: R.sp(context, 18), fontWeight: FontWeight.bold, color: c.textPrimary),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -111,7 +112,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     IconButton(
                       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartPage())),
-                      icon: const Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary, size: 26),
+                      icon: Icon(Icons.shopping_cart_outlined, color: c.textPrimary, size: 26),
                     ),
                     if (count > 0)
                       Positioned(
@@ -120,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                           decoration: BoxDecoration(color: AppColors.badge, borderRadius: BorderRadius.circular(10)),
-                          child: Text('$count', style: const TextStyle(color: AppColors.textPrimary, fontSize: 11, fontWeight: FontWeight.bold)),
+                          child: Text('$count', style: TextStyle(color: c.textPrimary, fontSize: 11, fontWeight: FontWeight.bold)),
                         ),
                       ),
                   ],
@@ -133,7 +134,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context, double pad) {
+  Widget _buildSearchBar(BuildContext context, double pad, AppColors c) {
     return BlocBuilder<LocaleCubit, Locale>(
       builder: (context, _) => GestureDetector(
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SearchPage())),
@@ -141,15 +142,15 @@ class _HomePageState extends State<HomePage> {
           margin: EdgeInsets.fromLTRB(pad, 16, pad, 0),
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: R.wp(context, 14)),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: c.surface,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.divider),
+            border: Border.all(color: c.divider),
           ),
           child: Row(
             children: [
-              const Icon(Icons.search, color: AppColors.textHint, size: 22),
+              Icon(Icons.search, color: c.textHint, size: 22),
               const SizedBox(width: 10),
-              Text(context.tr(LK.searchHint), style: TextStyle(color: AppColors.textHint, fontSize: R.sp(context, 14))),
+              Text(context.tr(LK.searchHint), style: TextStyle(color: c.textHint, fontSize: R.sp(context, 14))),
             ],
           ),
         ),
@@ -157,13 +158,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _sectionTitle(BuildContext context, String key, double pad) {
+  Widget _sectionTitle(BuildContext context, String key, double pad, AppColors c) {
     return BlocBuilder<LocaleCubit, Locale>(
       builder: (context, _) => Padding(
         padding: EdgeInsets.fromLTRB(pad, 20, pad, 10),
         child: Text(
           context.tr(key),
-          style: TextStyle(color: AppColors.textPrimary, fontSize: R.sp(context, 18), fontWeight: FontWeight.bold),
+          style: TextStyle(color: c.textPrimary, fontSize: R.sp(context, 18), fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -194,7 +195,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  SliverPadding _buildProductGrid(BuildContext context, double pad) {
+  SliverPadding _buildProductGrid(BuildContext context, double pad, AppColors c) {
     return SliverPadding(
       padding: EdgeInsets.symmetric(horizontal: pad),
       sliver: BlocBuilder<ProductCubit, ProductState>(
@@ -213,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       const Icon(Icons.error_outline, color: AppColors.error, size: 48),
                       const SizedBox(height: 12),
-                      Text(state.message, style: const TextStyle(color: AppColors.textSecondary)),
+                      Text(state.message, style: TextStyle(color: c.textSecondary)),
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed: () => context.read<ProductCubit>().loadProducts(),
@@ -234,9 +235,9 @@ class _HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.all(40),
                     child: Column(
                       children: [
-                        const Icon(Icons.inventory_2_outlined, color: AppColors.textHint, size: 48),
+                        Icon(Icons.inventory_2_outlined, color: c.textHint, size: 48),
                         const SizedBox(height: 12),
-                        Text(context.tr(LK.noProducts), style: const TextStyle(color: AppColors.textSecondary, fontSize: 16)),
+                        Text(context.tr(LK.noProducts), style: TextStyle(color: c.textSecondary, fontSize: 16)),
                       ],
                     ),
                   ),

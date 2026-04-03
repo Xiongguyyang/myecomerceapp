@@ -68,10 +68,11 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void _showSnack(String msg) {
+    final c = AppColors.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: AppColors.surface,
+        backgroundColor: c.surface,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
@@ -81,18 +82,19 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     final pad = R.hp(context);
+    final c = AppColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: c.background,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => const SigninPage()),
           ),
-          icon: const Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: c.textPrimary, size: 20),
         ),
       ),
       body: SafeArea(
@@ -106,36 +108,37 @@ class _SignupPageState extends State<SignupPage> {
                 style: GoogleFonts.oswald(
                   fontSize: R.sp(context, 30),
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: c.textPrimary,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 context.tr(LK.createSubtitle),
-                style: TextStyle(fontSize: R.sp(context, 14), color: AppColors.textHint),
+                style: TextStyle(fontSize: R.sp(context, 14), color: c.textHint),
               ),
               const SizedBox(height: 32),
               R.isPhone(context)
                   ? Column(children: [
-                      _field(controller: _firstNameController, label: context.tr(LK.firstName), icon: Icons.person_outline),
+                      _field(c: c, controller: _firstNameController, label: context.tr(LK.firstName), icon: Icons.person_outline),
                       const SizedBox(height: 14),
-                      _field(controller: _lastNameController, label: context.tr(LK.lastName), icon: Icons.person_outline),
+                      _field(c: c, controller: _lastNameController, label: context.tr(LK.lastName), icon: Icons.person_outline),
                     ])
                   : Row(children: [
-                      Expanded(child: _field(controller: _firstNameController, label: context.tr(LK.firstName), icon: Icons.person_outline)),
+                      Expanded(child: _field(c: c, controller: _firstNameController, label: context.tr(LK.firstName), icon: Icons.person_outline)),
                       const SizedBox(width: 14),
-                      Expanded(child: _field(controller: _lastNameController, label: context.tr(LK.lastName), icon: Icons.person_outline)),
+                      Expanded(child: _field(c: c, controller: _lastNameController, label: context.tr(LK.lastName), icon: Icons.person_outline)),
                     ]),
               const SizedBox(height: 14),
-              _field(controller: _emailController, label: context.tr(LK.email), icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+              _field(c: c, controller: _emailController, label: context.tr(LK.email), icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
               const SizedBox(height: 14),
               _field(
+                c: c,
                 controller: _passwordController,
                 label: context.tr(LK.password),
                 icon: Icons.lock_outline,
                 obscureText: _obscure,
                 suffix: IconButton(
-                  icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: AppColors.textHint, size: 20),
+                  icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined, color: c.textHint, size: 20),
                   onPressed: () => setState(() => _obscure = !_obscure),
                 ),
               ),
@@ -153,7 +156,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                         child: Text(
                           context.tr(LK.createAccount),
-                          style: TextStyle(color: AppColors.textPrimary, fontSize: R.sp(context, 16), fontWeight: FontWeight.bold),
+                          style: TextStyle(color: c.textPrimary, fontSize: R.sp(context, 16), fontWeight: FontWeight.bold),
                         ),
                       ),
               ),
@@ -162,7 +165,7 @@ class _SignupPageState extends State<SignupPage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(context.tr(LK.alreadyHaveAccount), style: TextStyle(color: AppColors.textSecondary, fontSize: R.sp(context, 14))),
+                    Text(context.tr(LK.alreadyHaveAccount), style: TextStyle(color: c.textSecondary, fontSize: R.sp(context, 14))),
                     GestureDetector(
                       onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const SigninPage())),
                       child: Text(context.tr(LK.signIn), style: TextStyle(color: AppColors.accent, fontSize: R.sp(context, 14), fontWeight: FontWeight.bold)),
@@ -179,6 +182,7 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Widget _field({
+    required AppColors c,
     required TextEditingController controller,
     required String label,
     required IconData icon,
@@ -189,22 +193,22 @@ class _SignupPageState extends State<SignupPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: AppColors.textSecondary, fontSize: R.sp(context, 13), fontWeight: FontWeight.w600)),
+        Text(label, style: TextStyle(color: c.textSecondary, fontSize: R.sp(context, 13), fontWeight: FontWeight.w600)),
         const SizedBox(height: 6),
         TextField(
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscureText,
-          style: TextStyle(color: AppColors.textPrimary, fontSize: R.sp(context, 15)),
+          style: TextStyle(color: c.textPrimary, fontSize: R.sp(context, 15)),
           cursorColor: AppColors.accent,
           decoration: InputDecoration(
             filled: true,
-            fillColor: AppColors.inputFill,
-            prefixIcon: Icon(icon, color: AppColors.textHint, size: 20),
+            fillColor: c.inputFill,
+            prefixIcon: Icon(icon, color: c.textHint, size: 20),
             suffixIcon: suffix,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.divider)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.divider)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.accent, width: 1.5)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: c.divider)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: c.divider)),
+            focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: AppColors.accent, width: 1.5)),
             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: R.wp(context, 16)),
           ),
         ),

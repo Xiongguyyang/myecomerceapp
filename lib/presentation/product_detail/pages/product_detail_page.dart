@@ -21,9 +21,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
+    final c = AppColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -36,7 +37,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.background.withValues(alpha: 0.6),
+                    color: c.background.withValues(alpha: 0.6),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
@@ -49,7 +50,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   loadingBuilder: (_, child, progress) {
                     if (progress == null) return child;
                     return Container(
-                      color: AppColors.surfaceLight,
+                      color: c.surfaceLight,
                       child: Center(
                         child: CircularProgressIndicator(
                           color: AppColors.accent,
@@ -61,8 +62,8 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     );
                   },
                   errorBuilder: (_, e, s) => Container(
-                    color: AppColors.surfaceLight,
-                    child: const Center(child: Icon(Icons.image_not_supported, color: AppColors.textHint, size: 60)),
+                    color: c.surfaceLight,
+                    child: Center(child: Icon(Icons.image_not_supported, color: c.textHint, size: 60)),
                   ),
                 ),
               ),
@@ -86,7 +87,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text(product.name, style: TextStyle(color: AppColors.textPrimary, fontSize: R.sp(context, 22), fontWeight: FontWeight.bold)),
+                    Text(product.name, style: TextStyle(color: c.textPrimary, fontSize: R.sp(context, 22), fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     // Rating
                     Row(
@@ -96,9 +97,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                           color: AppColors.star, size: 22,
                         )),
                         const SizedBox(width: 8),
-                        Text('${product.rating}', style: const TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text('${product.rating}', style: TextStyle(color: c.textPrimary, fontSize: 16, fontWeight: FontWeight.bold)),
                         const SizedBox(width: 6),
-                        Text('(${product.reviewCount} ${context.tr(LK.reviews)})', style: const TextStyle(color: AppColors.textHint, fontSize: 14)),
+                        Text('(${product.reviewCount} ${context.tr(LK.reviews)})', style: TextStyle(color: c.textHint, fontSize: 14)),
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -113,32 +114,32 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             padding: const EdgeInsets.only(bottom: 4),
                             child: Text(
                               '\$${product.originalPrice!.toStringAsFixed(2)}',
-                              style: const TextStyle(color: AppColors.textHint, fontSize: 18, decoration: TextDecoration.lineThrough),
+                              style: TextStyle(color: c.textHint, fontSize: 18, decoration: TextDecoration.lineThrough),
                             ),
                           ),
                         ],
                       ],
                     ),
                     const SizedBox(height: 24),
-                    const Divider(color: AppColors.divider),
+                    Divider(color: c.divider),
                     const SizedBox(height: 16),
-                    Text(context.tr(LK.description), style: TextStyle(color: AppColors.textPrimary, fontSize: R.sp(context, 17), fontWeight: FontWeight.bold)),
+                    Text(context.tr(LK.description), style: TextStyle(color: c.textPrimary, fontSize: R.sp(context, 17), fontWeight: FontWeight.bold)),
                     const SizedBox(height: 10),
-                    Text(product.description, style: const TextStyle(color: AppColors.textSecondary, fontSize: 15, height: 1.6)),
+                    Text(product.description, style: TextStyle(color: c.textSecondary, fontSize: 15, height: 1.6)),
                     const SizedBox(height: 20),
                     if (product.tags.isNotEmpty) ...[
-                      Text(context.tr(LK.tags), style: TextStyle(color: AppColors.textPrimary, fontSize: R.sp(context, 17), fontWeight: FontWeight.bold)),
+                      Text(context.tr(LK.tags), style: TextStyle(color: c.textPrimary, fontSize: R.sp(context, 17), fontWeight: FontWeight.bold)),
                       const SizedBox(height: 10),
                       Wrap(
                         spacing: 8, runSpacing: 8,
                         children: product.tags.map((tag) => Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: AppColors.surface,
+                            color: c.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: AppColors.divider),
+                            border: Border.all(color: c.divider),
                           ),
-                          child: Text('#$tag', style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                          child: Text('#$tag', style: TextStyle(color: c.textSecondary, fontSize: 13)),
                         )).toList(),
                       ),
                     ],
@@ -172,20 +173,20 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         child: Row(
           children: [
             Container(
-              decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.divider)),
+              decoration: BoxDecoration(color: c.surface, borderRadius: BorderRadius.circular(12), border: Border.all(color: c.divider)),
               child: Row(
                 children: [
                   IconButton(
                     onPressed: () { if (_quantity > 1) setState(() => _quantity--); },
-                    icon: const Icon(Icons.remove, color: AppColors.textPrimary, size: 20),
+                    icon: Icon(Icons.remove, color: c.textPrimary, size: 20),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('$_quantity', style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: Text('$_quantity', style: TextStyle(color: c.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
                   ),
                   IconButton(
                     onPressed: () => setState(() => _quantity++),
-                    icon: const Icon(Icons.add, color: AppColors.textPrimary, size: 20),
+                    icon: Icon(Icons.add, color: c.textPrimary, size: 20),
                   ),
                 ],
               ),
@@ -209,7 +210,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.accent,
-                  disabledBackgroundColor: AppColors.textHint,
+                  disabledBackgroundColor: c.textHint,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),

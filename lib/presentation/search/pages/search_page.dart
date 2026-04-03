@@ -51,9 +51,10 @@ class _SearchPageBodyState extends State<_SearchPageBody> {
   @override
   Widget build(BuildContext context) {
     final cols = R.gridCols(context);
+    final c = AppColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: c.background,
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
         leading: IconButton(
@@ -71,7 +72,7 @@ class _SearchPageBodyState extends State<_SearchPageBody> {
           cursorColor: AppColors.accent,
           decoration: InputDecoration(
             hintText: context.tr(LK.searchPageHint),
-            hintStyle: TextStyle(color: AppColors.textHint),
+            hintStyle: TextStyle(color: c.textHint),
             border: InputBorder.none,
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
@@ -80,7 +81,7 @@ class _SearchPageBodyState extends State<_SearchPageBody> {
                       context.read<SearchCubit>().clearSearch();
                       setState(() {});
                     },
-                    icon: const Icon(Icons.close, color: AppColors.textHint),
+                    icon: Icon(Icons.close, color: c.textHint),
                   )
                 : null,
           ),
@@ -90,7 +91,7 @@ class _SearchPageBodyState extends State<_SearchPageBody> {
         builder: (context, state) {
           if (state is SearchInitial)  return _buildInitial(context);
           if (state is SearchLoading)  return const Center(child: CircularProgressIndicator(color: AppColors.accent));
-          if (state is SearchError)    return _buildError(state.message);
+          if (state is SearchError)    return _buildError(context, state.message);
           if (state is SearchLoaded) {
             if (state.isEmpty) return _buildNoResults(context, state.query);
             return _buildResults(context, state, cols);
@@ -102,52 +103,56 @@ class _SearchPageBodyState extends State<_SearchPageBody> {
   }
 
   Widget _buildInitial(BuildContext context) {
+    final c = AppColors.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search, color: AppColors.textHint.withValues(alpha: 0.5), size: 80),
+          Icon(Icons.search, color: c.textHint.withValues(alpha: 0.5), size: 80),
           const SizedBox(height: 16),
-          Text(context.tr(LK.searchForProducts), style: const TextStyle(color: AppColors.textHint, fontSize: 18)),
+          Text(context.tr(LK.searchForProducts), style: TextStyle(color: c.textHint, fontSize: 18)),
           const SizedBox(height: 8),
-          Text(context.tr(LK.searchTip), style: const TextStyle(color: AppColors.textHint, fontSize: 14)),
+          Text(context.tr(LK.searchTip), style: TextStyle(color: c.textHint, fontSize: 14)),
         ],
       ),
     );
   }
 
-  Widget _buildError(String message) {
+  Widget _buildError(BuildContext context, String message) {
+    final c = AppColors.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.error_outline, color: AppColors.error, size: 48),
           const SizedBox(height: 12),
-          Text(message, style: const TextStyle(color: AppColors.textSecondary)),
+          Text(message, style: TextStyle(color: c.textSecondary)),
         ],
       ),
     );
   }
 
   Widget _buildNoResults(BuildContext context, String query) {
+    final c = AppColors.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.search_off, color: AppColors.textHint, size: 60),
+          Icon(Icons.search_off, color: c.textHint, size: 60),
           const SizedBox(height: 16),
           Text(
             '${context.tr(LK.noResultsFor)} "$query"',
-            style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(color: c.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          Text(context.tr(LK.tryDifferentKeywords), style: const TextStyle(color: AppColors.textHint, fontSize: 14)),
+          Text(context.tr(LK.tryDifferentKeywords), style: TextStyle(color: c.textHint, fontSize: 14)),
         ],
       ),
     );
   }
 
   Widget _buildResults(BuildContext context, SearchLoaded state, int cols) {
+    final c = AppColors.of(context);
     final count = state.results.length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +161,7 @@ class _SearchPageBodyState extends State<_SearchPageBody> {
           padding: EdgeInsets.fromLTRB(R.hp(context), 16, R.hp(context), 12),
           child: Text(
             '$count ${context.tr(LK.resultsFor)} "${state.query}"',
-            style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
+            style: TextStyle(color: c.textSecondary, fontSize: 14),
           ),
         ),
         Expanded(

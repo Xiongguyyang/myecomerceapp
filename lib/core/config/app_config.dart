@@ -19,7 +19,7 @@ class AppConfig {
   static const dev = AppConfig(
     appName: 'Flexy (Dev)',
     environment: Environment.dev,
-    showDebugBanner: true,
+    showDebugBanner: false,
     firebaseProjectId: 'myecomerceapp-27315',
   );
 
