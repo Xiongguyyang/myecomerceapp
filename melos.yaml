@@ -1,0 +1,58 @@
+name: flex_retru_workspace
+
+repository: https://github.com/Xiongguyyang/myecomerceapp
+
+packages:
+  - .
+  - packages/**
+
+sdkPath: auto
+
+command:
+  version:
+    workspaceChangelog: true
+
+scripts:
+  # ─── Flutter ───────────────────────────────────────────────────────────────
+  get:
+    run: flutter pub get
+    description: Install dependencies
+
+  clean:
+    run: flutter clean
+    description: Clean build artifacts
+
+  analyze:
+    run: flutter analyze
+    description: Run Dart static analysis
+
+  test:
+    run: flutter test
+    description: Run all tests
+
+  # ─── Android APK ───────────────────────────────────────────────────────────
+  build:apk:dev:
+    run: flutter build apk --debug --target lib/main_dev.dart
+    description: Build debug APK (Dev)
+
+  build:apk:prod:
+    run: flutter build apk --release --target lib/main_prod.dart
+    description: Build release APK (Prod)
+
+  # ─── iOS IPA ───────────────────────────────────────────────────────────────
+  build:ipa:dev:
+    run: flutter build ipa --target lib/main_dev.dart
+    description: Build IPA (Dev)
+
+  build:ipa:prod:
+    run: flutter build ipa --release --target lib/main_prod.dart
+    description: Build release IPA (Prod)
+
+  # ─── Combined ──────────────────────────────────────────────────────────────
+  release:dev:
+    run: melos build:apk:dev && melos build:ipa:dev
+    description: Build all release artifacts for Dev
+
+  release:prod:
+    run: melos build:apk:prod && melos build:ipa:prod
+    description: Build all release artifacts for Prod

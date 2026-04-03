@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:myecomerceapp/core/constants/app_colors.dart';
-import 'package:myecomerceapp/presentation/home/pages/learning/learn_State.dart';
+import 'package:myecomerceapp/core/utils/app_responsive.dart';
 
 class PromotionBanner extends StatefulWidget {
   const PromotionBanner({super.key});
@@ -13,9 +13,9 @@ class PromotionBanner extends StatefulWidget {
 class _PromotionBannerState extends State<PromotionBanner> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  Timer? _autoSlideTimer;
+  Timer? _timer;
 
-  final List<_BannerData> _banners = const [
+  static const _banners = [
     _BannerData(
       title: 'Flash Sale',
       subtitle: 'Up to 50% off on Electronics',
@@ -39,15 +39,11 @@ class _PromotionBannerState extends State<PromotionBanner> {
   @override
   void initState() {
     super.initState();
-    _startAutoSlide();
-  }
-
-  void _startAutoSlide() {
-    _autoSlideTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (_) {
       if (!mounted) return;
-      final nextPage = (_currentPage + 1) % _banners.length;
+      final next = (_currentPage + 1) % _banners.length;
       _pageController.animateToPage(
-        nextPage,
+        next,
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
       );
@@ -56,68 +52,66 @@ class _PromotionBannerState extends State<PromotionBanner> {
 
   @override
   void dispose() {
-    _autoSlideTimer?.cancel();
+    _timer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
+    final bannerHeight = R.wp(context, 140).clamp(120.0, 180.0);
+    final pad = R.hp(context);
+
     return Column(
       children: [
         SizedBox(
-          height: 140,
+          height: bannerHeight,
           child: PageView.builder(
             controller: _pageController,
-            onPageChanged: (index) => setState(() => _currentPage = index),
+            onPageChanged: (i) => setState(() => _currentPage = i),
             itemCount: _banners.length,
             itemBuilder: (context, index) {
-              final banner = _banners[index];
+              final b = _banners[index];
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
+                margin: EdgeInsets.symmetric(horizontal: pad),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: banner.gradient),
+                  gradient: LinearGradient(colors: b.gradient),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    children: [
-                      TextButton(
-                        onPressed: (){
-                         Navigator.pushReplacement(context, 
-                         MaterialPageRoute(builder: (context) => const LearnStatePage()));
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              banner.title,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            b.title,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: R.sp(context, 22),
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              banner.subtitle,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.9),
-                                fontSize: 14,
-                              ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            b.subtitle,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontSize: R.sp(context, 13),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      Icon(
-                        banner.icon,
-                        size: 60,
-                        color: Colors.white.withValues(alpha: 0.4),
-                      ),
-                    ],
-                  ),
+                    ),
+                    Icon(
+                      b.icon,
+                      size: R.wp(context, 56),
+                      color: Colors.white.withValues(alpha: 0.35),
+                    ),
+                  ],
                 ),
               );
             },
@@ -128,13 +122,13 @@ class _PromotionBannerState extends State<PromotionBanner> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
             _banners.length,
-            (index) => AnimatedContainer(
+            (i) => AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(horizontal: 3),
               height: 6,
-              width: _currentPage == index ? 20 : 6,
+              width: _currentPage == i ? 20 : 6,
               decoration: BoxDecoration(
-                color: _currentPage == index ? AppColors.accent : AppColors.textHint,
+                color: _currentPage == i ? AppColors.accent : c.textHint,
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -150,7 +144,6 @@ class _BannerData {
   final String subtitle;
   final IconData icon;
   final List<Color> gradient;
-
   const _BannerData({
     required this.title,
     required this.subtitle,

@@ -16,6 +16,7 @@ class CartItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     return Dismissible(
       key: Key(item.product.id),
       direction: DismissDirection.endToStart,
@@ -32,7 +33,7 @@ class CartItemWidget extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.cardBackground,
+          color: c.cardBackground,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -49,7 +50,7 @@ class CartItemWidget extends StatelessWidget {
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(
-                      color: AppColors.surfaceLight,
+                      color: c.surfaceLight,
                       child: const Center(
                         child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.accent),
                       ),
@@ -57,8 +58,8 @@ class CartItemWidget extends StatelessWidget {
                   },
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: AppColors.surfaceLight,
-                      child: const Icon(Icons.image_not_supported, color: AppColors.textHint, size: 30),
+                      color: c.surfaceLight,
+                      child: Icon(Icons.image_not_supported, color: c.textHint, size: 30),
                     );
                   },
                 ),
@@ -79,8 +80,8 @@ class CartItemWidget extends StatelessWidget {
                           item.product.name,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
+                          style: TextStyle(
+                            color: c.textPrimary,
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
                           ),
@@ -107,8 +108,8 @@ class CartItemWidget extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     '\$${item.product.price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      color: AppColors.textHint,
+                    style: TextStyle(
+                      color: c.textHint,
                       fontSize: 13,
                     ),
                   ),
@@ -119,14 +120,15 @@ class CartItemWidget extends StatelessWidget {
                       // Quantity controls
                       Container(
                         decoration: BoxDecoration(
-                          color: AppColors.surface,
+                          color: c.surface,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppColors.divider),
+                          border: Border.all(color: c.divider),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             _quantityButton(
+                              context: context,
                               icon: Icons.remove,
                               onTap: () {
                                 if (item.quantity > 1) {
@@ -138,14 +140,15 @@ class CartItemWidget extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(horizontal: 12),
                               child: Text(
                                 '${item.quantity}',
-                                style: const TextStyle(
-                                  color: AppColors.textPrimary,
+                                style: TextStyle(
+                                  color: c.textPrimary,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                             _quantityButton(
+                              context: context,
                               icon: Icons.add,
                               onTap: () => onQuantityChanged(item.quantity + 1),
                             ),
@@ -172,12 +175,13 @@ class CartItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _quantityButton({required IconData icon, required VoidCallback onTap}) {
+  Widget _quantityButton({required BuildContext context, required IconData icon, required VoidCallback onTap}) {
+    final c = AppColors.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.all(8),
-        child: Icon(icon, color: AppColors.textSecondary, size: 18),
+        child: Icon(icon, color: c.textSecondary, size: 18),
       ),
     );
   }
