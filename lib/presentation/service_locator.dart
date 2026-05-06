@@ -7,6 +7,7 @@ import 'package:myecomerceapp/domain/auth/repository/atuh.dart';
 // Product
 import 'package:myecomerceapp/data/product/datasource/product_local_datasource.dart';
 import 'package:myecomerceapp/data/product/repository/product_repository_impl.dart';
+import 'package:myecomerceapp/data/supabase/repositories/product_supabase_repository.dart';
 import 'package:myecomerceapp/domain/product/repository/product_repository.dart';
 import 'package:myecomerceapp/domain/product/usecases/get_all_products.dart';
 import 'package:myecomerceapp/domain/product/usecases/get_products_by_category.dart';
@@ -35,8 +36,9 @@ Future<void> initializeDependencies() async {
 
   // Product datasource & repository
   sl.registerSingleton<ProductLocalDatasource>(ProductLocalDatasource());
+  sl.registerSingleton<ProductSupabaseRepository>(ProductSupabaseRepository());
   sl.registerSingleton<ProductRepository>(
-    ProductRepositoryImpl(sl<ProductLocalDatasource>()),
+    ProductRepositoryImpl(sl<ProductLocalDatasource>(), sl<ProductSupabaseRepository>()),
   );
 
   // Product use cases

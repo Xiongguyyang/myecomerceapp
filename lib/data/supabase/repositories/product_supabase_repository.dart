@@ -8,26 +8,39 @@ class ProductSupabaseRepository {
   // Fetch all products
   Future<List<ProductSupabaseModel>> getAllProducts() async {
     try {
+      print('🔵 Supabase: Fetching products from table "$tableName"...');
+      print('🔵 Supabase: REST endpoint ${_client.rest.url}/$tableName');
+      print('🔵 Supabase: Current auth user ${_client.auth.currentUser?.id ?? 'none'}');
       final response = await _client
           .from(tableName)
           .select()
           .order('created_at', ascending: false);
 
-      return (response as List)
+      print('🔵 Supabase: Response type: ${response.runtimeType}');
+      print('🔵 Supabase: Response data: $response');
+
+      final products = (response as List)
           .map((item) => ProductSupabaseModel.fromJson(item))
           .toList();
-    } catch (e) {
+
+      print('🔵 Supabase: Successfully parsed ${products.length} products');
+      return products;
+    } catch (e, stackTrace) {
+      print('❌ Supabase Error: $e');
+      print('❌ Stack trace: $stackTrace');
       throw Exception('Failed to fetch products: $e');
     }
   }
 
   // Fetch products by category
-  Future<List<ProductSupabaseModel>> getProductsByCategory(String category) async {
+  Future<List<ProductSupabaseModel>> getProductsByCategory(
+    String category,
+  ) async {
     try {
       final response = await _client
           .from(tableName)
           .select()
-          .eq('category', category)
+          .ilike('category', category)
           .order('created_at', ascending: false);
 
       return (response as List)
@@ -104,7 +117,10 @@ class ProductSupabaseRepository {
         .from(tableName)
         .stream(primaryKey: ['id'])
         .order('created_at', ascending: false)
-        .map((data) => data.map((item) => ProductSupabaseModel.fromJson(item)).toList());
+        .map(
+          (data) =>
+              data.map((item) => ProductSupabaseModel.fromJson(item)).toList(),
+        );
   }
 
   // Get products with filters

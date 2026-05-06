@@ -14,6 +14,7 @@ import 'package:myecomerceapp/presentation/splash/bloc/splas_cubit.dart';
 import 'package:myecomerceapp/presentation/splash/pages/splash.dart';
 import 'package:myecomerceapp/presentation/home/cubit/product_cubit.dart';
 import 'package:myecomerceapp/presentation/cart/cubit/cart_cubit.dart';
+import 'package:myecomerceapp/presentation/profile/cubit/profile_cubit.dart';
 import 'package:myecomerceapp/domain/product/usecases/get_all_products.dart';
 import 'package:myecomerceapp/domain/product/usecases/get_products_by_category.dart';
 import 'package:myecomerceapp/domain/product/repository/product_repository.dart';
@@ -70,6 +71,9 @@ class MyApp extends StatelessWidget {
             updateCartQuantity: sl<UpdateCartQuantity>(),
             clearCart: sl<ClearCart>(),
           ),
+        ),
+        BlocProvider(
+          create: (_) => ProfileCubit(),
         ),
       ],
       // BlocBuilder rebuilds MaterialApp when locale or theme changes.

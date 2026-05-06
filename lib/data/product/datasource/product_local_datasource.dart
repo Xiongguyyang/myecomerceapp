@@ -6,13 +6,18 @@ class ProductLocalDatasource {
   List<CategoryEntity> getCategories() {
     return const [
       CategoryEntity(id: 'all', name: 'All', icon: Icons.apps),
-      CategoryEntity(id: 'electronics', name: 'Electronics', icon: Icons.devices),
-      CategoryEntity(id: 'clothing', name: 'Clothing', icon: Icons.checkroom),
-      CategoryEntity(id: 'shoes', name: 'Shoes', icon: Icons.skateboarding),
-      CategoryEntity(id: 'accessories', name: 'Accessories', icon: Icons.watch),
-      CategoryEntity(id: 'home', name: 'Home', icon: Icons.home),
-      CategoryEntity(id: 'sports', name: 'Sports', icon: Icons.sports_basketball),
-      CategoryEntity(id: 'books', name: 'Books', icon: Icons.book),
+      CategoryEntity(
+        id: 'Electronics',
+        name: 'Electronics',
+        icon: Icons.devices,
+      ),
+      CategoryEntity(id: 'Fashion', name: 'Fashion', icon: Icons.checkroom),
+      CategoryEntity(id: 'Home', name: 'Home', icon: Icons.home),
+      CategoryEntity(
+        id: 'Sports',
+        name: 'Sports',
+        icon: Icons.sports_basketball,
+      ),
     ];
   }
 

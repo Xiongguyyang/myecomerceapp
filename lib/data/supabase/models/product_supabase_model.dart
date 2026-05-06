@@ -31,7 +31,7 @@ class ProductSupabaseModel {
 
   factory ProductSupabaseModel.fromJson(Map<String, dynamic> json) {
     return ProductSupabaseModel(
-      id: json['id'] as String,
+      id: json['id'].toString(),
       name: json['name'] as String,
       description: json['description'] as String,
       price: (json['price'] as num).toDouble(),
@@ -43,7 +43,7 @@ class ProductSupabaseModel {
       rating: (json['rating'] as num).toDouble(),
       reviewCount: json['review_count'] as int,
       inStock: json['in_stock'] as bool? ?? true,
-      tags: (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      tags: (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );

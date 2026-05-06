@@ -20,14 +20,21 @@ class ProductCubit extends Cubit<ProductState> {
         super(ProductInitial());
 
   Future<void> loadProducts() async {
+    print('🎯 ProductCubit: Starting to load products...');
     emit(ProductLoading());
     final result = await _getAllProducts(const NoParams());
     result.fold(
-      (error) => emit(ProductError(error)),
-      (products) => emit(ProductLoaded(
-        products: products,
-        categories: _productRepository.getCategories(),
-      )),
+      (error) {
+        print('❌ ProductCubit Error: $error');
+        emit(ProductError(error));
+      },
+      (products) {
+        print('✅ ProductCubit: Loaded ${products.length} products');
+        emit(ProductLoaded(
+          products: products,
+          categories: _productRepository.getCategories(),
+        ));
+      },
     );
   }
 
