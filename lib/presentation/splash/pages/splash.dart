@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:myecomerceapp/presentation/auth/page/signin.dart';
+import 'package:myecomerceapp/presentation/home/pages/home_page.dart';
 import 'package:myecomerceapp/presentation/splash/bloc/splas_cubit.dart';
 import 'package:myecomerceapp/presentation/splash/bloc/splas_state.dart';
 
@@ -63,7 +64,17 @@ class _SplashPagesState extends State<SplashPages>
           Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-              pageBuilder: (_, a, b) => SigninPage(),
+              pageBuilder: (_, a, b) => const SigninPage(),
+              transitionsBuilder: (_, anim, b, child) =>
+                  FadeTransition(opacity: anim, child: child),
+              transitionDuration: const Duration(milliseconds: 500),
+            ),
+          );
+        } else if (state is Authentication) {
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (_, a, b) => const HomePage(),
               transitionsBuilder: (_, anim, b, child) =>
                   FadeTransition(opacity: anim, child: child),
               transitionDuration: const Duration(milliseconds: 500),

@@ -44,7 +44,7 @@ PreferredSizeWidget appBarWidget() {
         String initials = first;
         if (first.isEmpty) initials += last.toUpperCase();
 
-        return Padding(
+        return Padding( 
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: GestureDetector(
             onTap: () {
@@ -88,7 +88,7 @@ PreferredSizeWidget appBarWidget() {
     ),
     actions: [
       IconButton(
-        iconSize: 40,
+        iconSize: 10,
         color: const Color.fromARGB(255, 255, 255, 255),
         alignment: Alignment.topLeft,
         onPressed: () {},

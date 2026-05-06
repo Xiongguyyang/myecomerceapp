@@ -22,6 +22,13 @@ class ProfileLoaded extends ProfileState {
   String get initials =>
       '${firstName.isNotEmpty ? firstName[0] : ''}${lastName.isNotEmpty ? lastName[0] : ''}'
           .toUpperCase();
+
+  String get displayName {
+    final name = '${firstName.trim()} ${lastName.trim()}'.trim();
+    if (name.isNotEmpty) return name;
+    if (email.contains('@')) return email.split('@').first;
+    return email.isNotEmpty ? email : 'User';
+  }
 }
 
 class ProfileError extends ProfileState {

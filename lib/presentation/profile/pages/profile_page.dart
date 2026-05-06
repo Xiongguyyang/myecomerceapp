@@ -12,6 +12,7 @@ import 'package:myecomerceapp/core/theme/theme_cubit.dart';
 import 'package:myecomerceapp/presentation/auth/page/signin.dart';
 import 'package:myecomerceapp/presentation/profile/cubit/profile_cubit.dart';
 import 'package:myecomerceapp/presentation/profile/cubit/profile_state.dart';
+import 'package:myecomerceapp/presentation/profile/widgets/user_avatar.dart';
 
 // ── Avatar options ─────────────────────────────────────────────────────────────
 const _avatarEmojis = ['🦊', '🐨', '🐯', '🦁', '🐻', '🐼', '🦋', '🐙'];
@@ -31,10 +32,7 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => ProfileCubit()..loadProfile(),
-      child: const _ProfileView(),
-    );
+    return const _ProfileView();
   }
 }
 
@@ -424,9 +422,8 @@ class _ProfileViewState extends State<_ProfileView> {
             builder: (context, currentMode) {
               final sheetColors = AppColors.of(context);
               final options = [
-                (ThemeMode.dark,   '🌙', context.tr(LK.themeDark)),
-                (ThemeMode.light,  '☀️', context.tr(LK.themeLight)),
-                (ThemeMode.system, '📱', context.tr(LK.themeSystem)),
+                (ThemeMode.light, '☀️', context.tr(LK.themeLight)),
+                (ThemeMode.dark,  '📱', context.tr(LK.themeSystem)),
               ];
               return Padding(
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
@@ -556,36 +553,7 @@ class _AvatarSection extends StatelessWidget {
   }
 
   Widget _buildAvatar(AppColors c) {
-    if (state.imagePath != null) {
-      return CircleAvatar(
-        radius: 52,
-        backgroundImage: FileImage(File(state.imagePath!)),
-      );
-    }
-    if (state.avatarIndex >= 0 && state.avatarIndex < _avatarEmojis.length) {
-      return CircleAvatar(
-        radius: 52,
-        backgroundColor: _avatarColors[state.avatarIndex],
-        child: Text(_avatarEmojis[state.avatarIndex], style: const TextStyle(fontSize: 40)),
-      );
-    }
-    // Default: initials
-    return Container(
-      width: 104,
-      height: 104,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [AppColors.accent, AppColors.accentLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [BoxShadow(color: Color(0x6612AEC6), blurRadius: 16, offset: Offset(0, 6))],
-      ),
-      child: Center(
-        child: Text(state.initials, style: const TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.bold)),
-      ),
-    );
+    return UserAvatar(state: state, radius: 52);
   }
 
   void _showPhotoOptions(BuildContext context) {
@@ -607,11 +575,12 @@ class _PhotoOptionsSheet extends StatelessWidget {
   const _PhotoOptionsSheet({required this.context});
 
   Future<void> _pick(ImageSource source, BuildContext ctx) async {
+    final cubit = ctx.read<ProfileCubit>();
     Navigator.pop(ctx);
     final picker = ImagePicker();
     final file   = await picker.pickImage(source: source, imageQuality: 80, maxWidth: 600);
-    if (file != null && ctx.mounted) {
-      ctx.read<ProfileCubit>().setImagePath(file.path);
+    if (file != null) {
+      cubit.setImagePath(file.path);
     }
   }
 
@@ -621,10 +590,10 @@ class _PhotoOptionsSheet extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(child: Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 20), decoration: BoxDecoration(color: c.divider, borderRadius: BorderRadius.circular(2)))),
+          Center(child: Container(width: 40, height: 4, margin:  const EdgeInsets.only(bottom: 0 ),decoration: BoxDecoration(color: c.divider, borderRadius: BorderRadius.circular(2)))),
           Text(context.tr(LK.uploadPhoto), style: TextStyle(color: c.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 16),
           _optionTile(sheetCtx, c, Icons.camera_alt_outlined, context.tr(LK.camera),  () => _pick(ImageSource.camera,  sheetCtx)),
@@ -650,6 +619,7 @@ class _PhotoOptionsSheet extends StatelessWidget {
                 child: Center(child: Text(_avatarEmojis[i], style: const TextStyle(fontSize: 30))),
               ),
             ),
+            
           ),
         ],
       ),

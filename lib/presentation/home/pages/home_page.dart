@@ -16,7 +16,10 @@ import 'package:myecomerceapp/presentation/home/widgets/category_chip.dart';
 import 'package:myecomerceapp/presentation/home/widgets/product_card.dart';
 import 'package:myecomerceapp/presentation/home/widgets/promotion_banner.dart';
 import 'package:myecomerceapp/presentation/product_detail/pages/product_detail_page.dart';
+import 'package:myecomerceapp/presentation/profile/cubit/profile_cubit.dart';
+import 'package:myecomerceapp/presentation/profile/cubit/profile_state.dart';
 import 'package:myecomerceapp/presentation/profile/pages/profile_page.dart';
+import 'package:myecomerceapp/presentation/profile/widgets/user_avatar.dart';
 import 'package:myecomerceapp/presentation/search/pages/search_page.dart';
 import 'package:myecomerceapp/widgets/refresh/app_refresh.dart';
 
@@ -72,65 +75,72 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildAppBar(BuildContext context, double pad, AppColors c) {
-    final user = FirebaseAuth.instance.currentUser;
-    final name = (user?.displayName?.trim().isNotEmpty == true)
-        ? user!.displayName!
-        : (user?.email?.split('@')[0] ?? 'Guest');
+    return BlocBuilder<ProfileCubit, ProfileState>(
+      builder: (context, profileState) {
+        String name = 'Guest';
+        Widget avatar = CircleAvatar(
+          radius: R.wp(context, 22),
+          backgroundColor: c.surfaceLight,
+          child: Icon(Icons.person, color: c.textSecondary, size: R.wp(context, 22)),
+        );
 
-    return BlocBuilder<LocaleCubit, Locale>(
-      builder: (context, _) => Padding(
-        padding: EdgeInsets.fromLTRB(pad, 14, pad, 0),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage())),
-              child: CircleAvatar(
-                radius: R.wp(context, 22),
-                backgroundColor: c.surfaceLight,
-                child: Icon(Icons.person, color: c.textSecondary, size: R.wp(context, 22)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(context.tr(LK.hello), style: TextStyle(color: c.textHint, fontSize: R.sp(context, 12))),
-                  Text(
-                    name,
-                    style: GoogleFonts.notoSans(fontSize: R.sp(context, 18), fontWeight: FontWeight.bold, color: c.textPrimary),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            BlocBuilder<CartCubit, CartState>(
-              builder: (context, state) {
-                final count = state is CartLoaded ? state.totalItems : 0;
-                return Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartPage())),
-                      icon: Icon(Icons.shopping_cart_outlined, color: c.textPrimary, size: 26),
-                    ),
-                    if (count > 0)
-                      Positioned(
-                        right: 2,
-                        top: 2,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                          decoration: BoxDecoration(color: AppColors.badge, borderRadius: BorderRadius.circular(10)),
-                          child: Text('$count', style: TextStyle(color: c.textPrimary, fontSize: 11, fontWeight: FontWeight.bold)),
-                        ),
+        if (profileState is ProfileLoaded) {
+          name = profileState.displayName;
+          avatar = UserAvatar(state: profileState, radius: R.wp(context, 22));
+        }
+
+        return BlocBuilder<LocaleCubit, Locale>(
+          builder: (context, _) => Padding(
+            padding: EdgeInsets.fromLTRB(pad, 14, pad, 0),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfilePage())),
+                  child: avatar,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(context.tr(LK.hello), style: TextStyle(color: c.textHint, fontSize: R.sp(context, 12))),
+                      Text(
+                        name,
+                        style: GoogleFonts.notoSans(fontSize: R.sp(context, 18), fontWeight: FontWeight.bold, color: c.textPrimary),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                  ],
-                );
-              },
+                    ],
+                  ),
+                ),
+                BlocBuilder<CartCubit, CartState>(
+                  builder: (context, state) {
+                    final count = state is CartLoaded ? state.totalItems : 0;
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartPage())),
+                          icon: Icon(Icons.shopping_cart_outlined, color: c.textPrimary, size: 26),
+                        ),
+                        if (count > 0)
+                          Positioned(
+                            right: 2,
+                            top: 2,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                              decoration: BoxDecoration(color: AppColors.badge, borderRadius: BorderRadius.circular(10)),
+                              child: Text('$count', style: TextStyle(color: c.textPrimary, fontSize: 11, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

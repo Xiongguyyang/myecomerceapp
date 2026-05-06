@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:myecomerceapp/core/config/app_config.dart';
+import 'package:myecomerceapp/core/config/supabase_config.dart';
 import 'package:myecomerceapp/core/localization/locale_cubit.dart';
 import 'package:myecomerceapp/core/theme/app_theme.dart';
 import 'package:myecomerceapp/core/theme/theme_cubit.dart';
@@ -24,7 +25,13 @@ import 'package:myecomerceapp/domain/cart/usecases/update_cart_quantity.dart';
 
 Future<void> mainWithConfig(AppConfig config) async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Initialize Supabase
+  await SupabaseConfig.initialize();
+
   await di.initializeDependencies();
 
   // Load saved language and theme before the first frame.

@@ -11,9 +11,8 @@ class ThemeCubit extends Cubit<ThemeMode> {
     final prefs = await SharedPreferences.getInstance();
     final stored = prefs.getString(_key);
     final mode = switch (stored) {
-      'light'  => ThemeMode.light,
-      'system' => ThemeMode.system,
-      _        => ThemeMode.dark,
+      'light' => ThemeMode.light,
+      _       => ThemeMode.dark,
     };
     emit(mode);
   }
